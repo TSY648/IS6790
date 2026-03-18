@@ -1,0 +1,61 @@
+{% extends "core/base.html" %}
+{% block title %}开篇剧情{% endblock %}
+
+{% block content %}
+<div style="padding:40px; max-width:900px; margin:0 auto;">
+    <div style="min-height:260px; background:#fff; border-radius:12px; padding:24px; box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+        <h2>开篇剧情</h2>
+        <div id="story-box" style="line-height:1.8; font-size:18px;"></div>
+    </div>
+
+    <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+        <button id="skip-btn">跳过剧情</button>
+        <button id="next-btn" style="display:none;">进入实习</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ story_lines|json_script:"story-lines-data" }}
+<script>
+const lines = JSON.parse(document.getElementById('story-lines-data').textContent);
+const box = document.getElementById('story-box');
+const nextBtn = document.getElementById('next-btn');
+const skipBtn = document.getElementById('skip-btn');
+
+let idx = 0;
+let timerId = null;
+
+function showNextLine() {
+    if (idx < lines.length) {
+        const p = document.createElement('p');
+        p.textContent = lines[idx];
+        box.appendChild(p);
+        idx += 1;
+        timerId = setTimeout(showNextLine, 900);
+    } else {
+        nextBtn.style.display = 'inline-block';
+    }
+}
+
+skipBtn.addEventListener('click', () => {
+    if (timerId) {
+        clearTimeout(timerId);
+    }
+    box.innerHTML = '';
+    lines.forEach((line) => {
+        const p = document.createElement('p');
+        p.textContent = line;
+        box.appendChild(p);
+    });
+    nextBtn.style.display = 'inline-block';
+});
+
+nextBtn.addEventListener('click', () => {
+    localStorage.setItem('current_level', '1');
+    window.location.href = '/levels/1/';
+});
+
+showNextLine();
+</script>
+{% endblock %}

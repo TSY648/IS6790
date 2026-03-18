@@ -1,0 +1,355 @@
+{% extends "core/base.html" %}
+{% block title %}{{ level.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .game-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr 320px;
+        gap: 16px;
+        padding: 16px;
+        height: calc(100vh - 64px);
+    }
+
+    .panel {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        overflow: auto;
+    }
+
+    .left-panel h2 {
+        margin-top: 0;
+    }
+
+    .center-panel {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tab-bar {
+        min-height: 48px;
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        background: #e5e7eb;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .canvas-area {
+        flex: 1;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 20px;
+        overflow: auto;
+        border: 1px solid #e5e7eb;
+    }
+
+    .category-title {
+        margin-top: 16px;
+        font-size: 15px;
+        color: #374151;
+        font-weight: bold;
+    }
+
+    .item-btn {
+        display: block;
+        width: 100%;
+        margin-top: 8px;
+        padding: 10px 12px;
+        background: #f3f4f6;
+        border: none;
+        border-radius: 8px;
+        text-align: left;
+    }
+
+    .item-btn.read {
+        background: #d1fae5;
+    }
+
+    .decision-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        color: white;
+        background: #9ca3af;
+    }
+
+    .decision-btn.enabled {
+        background: #2563eb;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .choice-box label {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .result-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .result-content {
+        background: white;
+        width: 520px;
+        max-width: 90%;
+        border-radius: 12px;
+        padding: 24px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-layout">
+    <aside class="panel left-panel">
+        <p>关卡 {{ level.order }}/7</p>
+        <h2 id="level-title">{{ level.title }}</h2>
+        <p id="level-desc">{{ level.description }}</p>
+        <hr>
+        <h3>任务目标</h3>
+        <p>找出影响草莓销量的关键信息，并决定下周最佳订货量。</p>
+    </aside>
+
+    <main class="panel center-panel">
+        <div id="tab-bar" class="tab-bar"></div>
+        <div id="canvas-area" class="canvas-area">
+            <h3>门店现场</h3>
+            <p>欢迎来到关卡 1。请先从右侧查看不同来源的信息。</p>
+            <p>你需要区分真正有用的信号和可能造成误导的噪音。</p>
+        </div>
+    </main>
+
+    <aside class="panel right-panel">
+        <h3>信息入口</h3>
+
+        <div class="category-title">NPC</div>
+        <div id="group-npc"></div>
+
+        <div class="category-title">报表</div>
+        <div id="group-report"></div>
+
+        <div class="category-title">外部信息</div>
+        <div id="group-external"></div>
+
+        <button id="decision-btn" class="decision-btn" disabled>提交决策</button>
+    </aside>
+</div>
+
+<div id="result-modal" class="result-modal hidden">
+    <div class="result-content">
+        <h3>结果反馈</h3>
+        <p id="result-message"></p>
+        <button id="result-action-btn">确定</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const levelOrder = {{ level.order }};
+let levelConfig = null;
+let readItems = JSON.parse(localStorage.getItem(`level_${levelOrder}_read_items`) || '[]');
+
+const tabBar = document.getElementById('tab-bar');
+const canvasArea = document.getElementById('canvas-area');
+const decisionBtn = document.getElementById('decision-btn');
+const resultModal = document.getElementById('result-modal');
+const resultMessage = document.getElementById('result-message');
+const resultActionBtn = document.getElementById('result-action-btn');
+
+function saveReadItems() {
+    localStorage.setItem(`level_${levelOrder}_read_items`, JSON.stringify(readItems));
+}
+
+function renderItemContent(item) {
+    const existingTab = document.getElementById(`tab-${item.item_code}`);
+    if (!existingTab) {
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.id = `tab-${item.item_code}`;
+        tab.textContent = item.title;
+        tabBar.appendChild(tab);
+    }
+
+    let html = `<h3>${item.title}</h3>`;
+
+    if (item.content_type === 'chart') {
+        html += `<p>${item.content_text}</p>`;
+        if (item.content_json.x && item.content_json.y) {
+            html += '<table border="1" cellpadding="8" cellspacing="0">';
+            html += '<tr><th>周次</th><th>销量</th></tr>';
+            item.content_json.x.forEach((x, index) => {
+                html += `<tr><td>${x}</td><td>${item.content_json.y[index]}</td></tr>`;
+            });
+            html += '</table>';
+        }
+    } else {
+        html += `<p>${item.content_text}</p>`;
+    }
+
+    canvasArea.innerHTML = html;
+
+    if (!readItems.includes(item.item_code)) {
+        readItems.push(item.item_code);
+        saveReadItems();
+    }
+
+    const btn = document.getElementById(`btn-${item.item_code}`);
+    if (btn) {
+        btn.classList.add('read');
+    }
+
+    checkDecisionUnlock();
+}
+
+function renderDecisionPanel() {
+    const decision = levelConfig.decision;
+    let html = `
+        <h3>${decision.title}</h3>
+        <p>${decision.target_text}</p>
+        <div class="choice-box">
+    `;
+
+    const options = decision.config_json.options || [];
+    options.forEach((opt) => {
+        html += `
+            <label>
+                <input type="radio" name="decision_value" value="${opt}">
+                ${opt} ${decision.config_json.unit || ''}
+            </label>
+        `;
+    });
+
+    html += `
+        </div>
+        <button id="confirm-submit-btn">确认提交</button>
+    `;
+
+    canvasArea.innerHTML = html;
+
+    document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
+}
+
+function checkDecisionUnlock() {
+    const keyItems = levelConfig.items.filter((item) => item.is_key_item).map((item) => item.item_code);
+    const allRead = keyItems.every((code) => readItems.includes(code));
+
+    if (allRead) {
+        decisionBtn.disabled = false;
+        decisionBtn.classList.add('enabled');
+    }
+}
+
+async function submitDecision() {
+    const selected = document.querySelector('input[name="decision_value"]:checked');
+    if (!selected) {
+        alert('请先选择订货量');
+        return;
+    }
+
+    const selectedValue = Number(selected.value);
+
+    const response = await fetch(`/levels/${levelOrder}/submit/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ selected_value: selectedValue })
+    });
+
+    const data = await response.json();
+    resultMessage.textContent = data.message;
+    resultModal.classList.remove('hidden');
+
+    if (data.success) {
+        resultActionBtn.textContent = '进入下一关';
+        localStorage.setItem('current_level', String(levelOrder + 1));
+        localStorage.setItem(`level_${levelOrder}_passed`, 'true');
+        resultActionBtn.onclick = () => {
+            window.location.href = `/levels/${levelOrder + 1}/`;
+        };
+    } else {
+        resultActionBtn.textContent = '重新开始本关';
+        localStorage.removeItem(`level_${levelOrder}_read_items`);
+        resultActionBtn.onclick = () => {
+            window.location.reload();
+        };
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.substring(0, name.length + 1) === `${name}=`) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function createItemButton(item) {
+    const btn = document.createElement('button');
+    btn.id = `btn-${item.item_code}`;
+    btn.className = 'item-btn';
+    btn.textContent = item.title;
+
+    if (readItems.includes(item.item_code)) {
+        btn.classList.add('read');
+    }
+
+    btn.addEventListener('click', () => renderItemContent(item));
+    return btn;
+}
+
+async function initLevel() {
+    const response = await fetch(`/levels/${levelOrder}/config/`);
+    levelConfig = await response.json();
+
+    const groups = {
+        npc: document.getElementById('group-npc'),
+        report: document.getElementById('group-report'),
+        external: document.getElementById('group-external'),
+    };
+
+    levelConfig.items.forEach((item) => {
+        if (item.is_initial_visible && groups[item.category]) {
+            groups[item.category].appendChild(createItemButton(item));
+        }
+    });
+
+    checkDecisionUnlock();
+
+    decisionBtn.addEventListener('click', () => {
+        if (!decisionBtn.disabled) {
+            renderDecisionPanel();
+        }
+    });
+}
+
+initLevel();
+</script>
+{% endblock %}

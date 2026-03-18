@@ -1,0 +1,49 @@
+{
+  "id": "level_1",
+  "title": "生鲜蔬果损耗危机",
+  "description": "玩家需要根据销售趋势、库存和损耗数据决定草莓订货量。",
+  "objectives": [
+    "将损耗率控制在 5% 以下",
+    "保证利润率不低于 2%"
+  ],
+  "story": {
+    "intro": "你是超市实习经理，本周草莓损耗异常，需要快速分析并做出订货决策。"
+  },
+  "dataSources": [
+    {
+      "id": "sales_trend",
+      "title": "历史销售趋势",
+      "type": "chart",
+      "initialVisible": true
+    },
+    {
+      "id": "survey_report",
+      "title": "顾客调研报告",
+      "type": "document",
+      "initialVisible": true
+    },
+    {
+      "id": "survey_raw",
+      "title": "调研原始数据",
+      "type": "table",
+      "initialVisible": false,
+      "unlockCondition": {
+        "readItem": "survey_report"
+      }
+    }
+  ],
+  "decision": {
+    "type": "slider",
+    "key": "orderQuantity",
+    "min": 0,
+    "max": 300,
+    "step": 10
+  },
+  "evaluation": {
+    "successRules": [
+      "DOC <= 3",
+      "lossRate <= 5",
+      "profitRate >= 2"
+    ]
+  }
+}

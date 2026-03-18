@@ -1,0 +1,29 @@
+{% extends "core/base.html" %}
+{% block title %}首页{% endblock %}
+
+{% block content %}
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:80vh;">
+    <h1>数据素养教学游戏</h1>
+    <p>欢迎来到社区超市实习经理挑战</p>
+    <button id="start-btn" style="padding:12px 24px; font-size:16px;">开始游戏</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('start-btn').addEventListener('click', function () {
+    const savedLevel = localStorage.getItem('current_level');
+    if (savedLevel) {
+        const goOn = confirm('检测到存档，是否继续游戏？\n点“取消”将重新开始。');
+        if (goOn) {
+            window.location.href = `/levels/${savedLevel}/`;
+        } else {
+            localStorage.clear();
+            window.location.href = '/story/opening/';
+        }
+    } else {
+        window.location.href = '/story/opening/';
+    }
+});
+</script>
+{% endblock %}

@@ -1,28 +1,132 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}数据素养游戏{% endblock %}</title>
+    <title>{% block title %}Data Literacy Game{% endblock %}</title>
     <style>
+        :root {
+            --bg: #f4efe6;
+            --panel: rgba(255, 252, 246, 0.92);
+            --panel-solid: #fffaf2;
+            --line: rgba(99, 86, 71, 0.16);
+            --text: #251c13;
+            --muted: #6f6255;
+            --brand: #d96b27;
+            --brand-dark: #ab4d13;
+            --accent: #1f6b52;
+            --locked: #c8c0b7;
+            --current: #f2c14e;
+            --done: #4f9d69;
+            --shadow: 0 18px 40px rgba(57, 38, 15, 0.12);
+        }
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            color: #222;
+            font-family: Inter, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(255, 210, 149, 0.45), transparent 28%),
+                radial-gradient(circle at top right, rgba(136, 207, 184, 0.3), transparent 22%),
+                linear-gradient(180deg, #f8f2e9 0%, var(--bg) 100%);
+            color: var(--text);
         }
         .topbar {
-            height: 64px;
-            background: #1f2937;
-            color: #fff;
+            min-height: 64px;
+            background: rgba(44, 34, 24, 0.92);
+            color: #fff7ee;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            gap: 24px;
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .container {
             min-height: calc(100vh - 64px);
+        }
+        .brand-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .brand-mark {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd36a, var(--brand));
+            box-shadow: 0 0 0 6px rgba(217, 107, 39, 0.18);
+        }
+        .topbar-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        .progress-shell {
+            min-width: 320px;
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .progress-track {
+            display: inline-flex;
+            gap: 8px;
+        }
+        .progress-dot {
+            width: 28px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--locked);
+            opacity: 0.75;
+        }
+        .progress-dot.done {
+            background: var(--done);
+            opacity: 1;
+        }
+        .progress-dot.current {
+            background: var(--current);
+            opacity: 1;
+            box-shadow: 0 0 0 5px rgba(242, 193, 78, 0.18);
+        }
+        .progress-label {
+            font-size: 14px;
+            color: #fff7ee;
+            white-space: nowrap;
+        }
+        .topbar-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ghost-btn,
+        .solid-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+        }
+        .ghost-btn {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff7ee;
+        }
+        .solid-btn {
+            background: linear-gradient(135deg, var(--brand), #f08a3e);
+            color: white;
+            box-shadow: 0 12px 24px rgba(217, 107, 39, 0.22);
+        }
+        .ghost-btn:hover,
+        .solid-btn:hover {
+            transform: translateY(-1px);
         }
         a {
             text-decoration: none;
@@ -31,18 +135,150 @@
         button {
             cursor: pointer;
         }
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(31, 24, 17, 0.54);
+            z-index: 100;
+            padding: 24px;
+        }
+        .modal-backdrop.hidden {
+            display: none;
+        }
+        .modal-card {
+            width: min(560px, 100%);
+            background: var(--panel-solid);
+            border-radius: 24px;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            color: var(--text);
+        }
+        .modal-card h3 {
+            margin: 0 0 8px;
+            font-size: 24px;
+        }
+        .modal-card p {
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        .modal-card ul {
+            margin: 16px 0 0;
+            padding-left: 20px;
+            color: var(--text);
+        }
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-top: 1px solid var(--line);
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .music-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(31, 107, 82, 0.1);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        @media (max-width: 1100px) {
+            .topbar {
+                flex-wrap: wrap;
+            }
+            .topbar-center {
+                order: 3;
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="topbar">
-        <div><strong>超市实习经理</strong></div>
-        <div>设置 / 帮助</div>
+        <a class="brand-link" href="/">
+            <span class="brand-mark"></span>
+            <span>Supermarket Manager Internship</span>
+        </a>
+        <div class="topbar-center">
+            {% if topbar_progress %}
+            <div class="progress-shell" aria-label="Game progress">
+                <div class="progress-track">
+                    {% for step in topbar_progress %}
+                    <span class="progress-dot {{ step.state }}" title="Level {{ step.order }}"></span>
+                    {% endfor %}
+                </div>
+                <span class="progress-label">{{ progress_label }}</span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="topbar-actions">
+            <button id="open-help-btn" class="ghost-btn" type="button">Settings / Help</button>
+        </div>
     </div>
 
     <div class="container">
         {% block content %}{% endblock %}
     </div>
+
+    <div id="help-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <h3>{{ help_title|default:"Settings & Help" }}</h3>
+            <p>{{ help_description|default:"Use the data panels to inspect evidence, then make a decision based on what the signals actually show." }}</p>
+            <div class="modal-row">
+                <div>
+                    <strong>Background Music</strong>
+                    <p style="margin:6px 0 0;">Reserved for a future version. The control is shown here to match the planned product structure.</p>
+                </div>
+                <span class="music-pill">Off</span>
+            </div>
+            <div class="modal-row">
+                <div>
+                    <strong>Play Rules</strong>
+                    <p style="margin:6px 0 0;">Review evidence, open the decision panel, confirm your choice, and learn from the result.</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="close-help-btn" class="solid-btn" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        const helpModal = document.getElementById('help-modal');
+        const openHelpBtn = document.getElementById('open-help-btn');
+        const closeHelpBtn = document.getElementById('close-help-btn');
+
+        function closeHelp() {
+            helpModal.classList.add('hidden');
+        }
+
+        openHelpBtn.addEventListener('click', () => {
+            helpModal.classList.remove('hidden');
+        });
+
+        closeHelpBtn.addEventListener('click', closeHelp);
+        helpModal.addEventListener('click', (event) => {
+            if (event.target === helpModal) {
+                closeHelp();
+            }
+        });
+    })();
+    </script>
 
     {% block extra_js %}{% endblock %}
 </body>

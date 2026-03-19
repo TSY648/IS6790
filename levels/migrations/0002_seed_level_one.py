@@ -11,61 +11,84 @@ def seed_level_one(apps, schema_editor):
     level1, _ = Level.objects.get_or_create(
         level_code='level_1',
         defaults={
-            'title': '生鲜蔬果损耗危机',
-            'description': '确定草莓的最佳订货量，完成品类扭亏为盈。',
+            'title': 'Fresh Produce Shrinkage Crisis',
+            'description': 'Determine the best strawberry order quantity and bring the category back to profit.',
             'order': 1,
             'is_active': True,
         },
     )
 
-    npc, _ = InfoCategory.objects.get_or_create(code='npc', defaults={'name': 'NPC'})
-    report, _ = InfoCategory.objects.get_or_create(code='report', defaults={'name': '报表'})
-    external, _ = InfoCategory.objects.get_or_create(code='external', defaults={'name': '外部信息'})
+    categories = {
+        'npc': 'NPC',
+        'report': 'Reports',
+        'external': 'External Info',
+    }
+    resolved_categories = {}
+    for code, name in categories.items():
+        category, _ = InfoCategory.objects.get_or_create(code=code, defaults={'name': name})
+        category.name = name
+        category.save(update_fields=['name'])
+        resolved_categories[code] = category
 
     items = [
         {
-            'category': npc,
+            'category': resolved_categories['npc'],
             'item_code': 'NPC_manager',
-            'title': '店长',
+            'title': 'Store Manager',
             'content_type': 'text',
-            'content_text': '小王，昨天草莓直接卖空了！看来这周行情大好，我们趁热打铁，把下周订货量直接翻倍，肯定能赚回来！',
+            'content_text': (
+                'The strawberries sold out yesterday. Demand must be booming, so let us double next week\'s '
+                'order and ride the momentum.'
+            ),
             'is_key_item': True,
             'sort_order': 1,
         },
         {
-            'category': npc,
+            'category': resolved_categories['npc'],
             'item_code': 'NPC_cashier',
-            'title': '张姐',
+            'title': 'Ms. Zhang',
             'content_type': 'text',
-            'content_text': '昨天好多人都是看了网上的视频来的，一进门就问草莓在哪，今天就没几个人问了。',
+            'content_text': (
+                'A lot of customers came in yesterday because of an online video and immediately asked where '
+                'the strawberries were. Hardly anyone asked today.'
+            ),
             'is_key_item': True,
             'sort_order': 2,
         },
         {
-            'category': report,
+            'category': resolved_categories['report'],
             'item_code': 'sales_trend',
-            'title': '草莓历史销售趋势图',
+            'title': 'Historical Strawberry Sales Trend',
             'content_type': 'chart',
-            'content_text': '过去4周销量平稳波动，昨日出现一个明显的销量翻倍尖刺。',
-            'content_json': {'x': ['第1周', '第2周', '第3周', '第4周', '昨天'], 'y': [180, 190, 175, 185, 360]},
+            'content_text': (
+                'Sales stayed relatively stable over the past four weeks, with a sharp spike yesterday that '
+                'was about double the usual volume.'
+            ),
+            'content_json': {
+                'x': ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Yesterday'],
+                'y': [180, 190, 175, 185, 360],
+            },
             'is_key_item': True,
             'sort_order': 3,
         },
         {
-            'category': external,
+            'category': resolved_categories['external'],
             'item_code': 'social_news',
-            'title': '社交媒体视频剪报',
+            'title': 'Social Media Video Clip',
             'content_type': 'text',
-            'content_text': '本地网红昨日在店门口拍摄了草莓推荐视频，获赞 10w+。',
+            'content_text': (
+                'A local influencer filmed a strawberry recommendation video outside the store yesterday, '
+                'and it received more than 100k likes.'
+            ),
             'is_key_item': True,
             'sort_order': 4,
         },
         {
-            'category': external,
+            'category': resolved_categories['external'],
             'item_code': 'weather_forecast',
-            'title': '未来一周降雨量',
+            'title': 'Rainfall Forecast for Next Week',
             'content_type': 'text',
-            'content_text': '未来一周连续降雨，预计到店客流下降30%。',
+            'content_text': 'Continuous rain is expected next week, and store traffic is projected to drop by 30%.',
             'is_key_item': True,
             'sort_order': 5,
         },
@@ -77,10 +100,10 @@ def seed_level_one(apps, schema_editor):
     DecisionConfig.objects.update_or_create(
         level=level1,
         defaults={
-            'title': '草莓每周期订货量决策',
-            'target_text': '请根据已有信息，决定本周草莓应订货多少斤。',
+            'title': 'Weekly Strawberry Order Decision',
+            'target_text': 'Based on the information above, decide how many kilograms of strawberries to order.',
             'decision_type': 'single_choice',
-            'config_json': {'options': [100, 200, 300], 'unit': '斤'},
+            'config_json': {'options': [100, 200, 300], 'unit': 'kg'},
         },
     )
 
@@ -89,7 +112,10 @@ def seed_level_one(apps, schema_editor):
             'rule_name': 'success_200',
             'condition_json': {'selected_value': 200},
             'is_success': True,
-            'message': '恭喜！您成功降低了草莓损耗率，实现了扭亏为盈！您精准识别了网红流量带来的噪音，抓住了销量的核心趋势，用数据做出了正确的决策！',
+            'message': (
+                'Great job! You reduced strawberry shrinkage and brought the category back to profit. '
+                'You filtered out the short-term influencer buzz and focused on the real demand trend.'
+            ),
             'score': 50,
             'next_action': 'next_level',
         },
@@ -97,7 +123,10 @@ def seed_level_one(apps, schema_editor):
             'rule_name': 'fail_100',
             'condition_json': {'selected_value': 100},
             'is_success': False,
-            'message': '很遗憾，您订货量太少，周中货架就已经空了，流失了大量顾客。',
+            'message': (
+                'Unfortunately, you ordered too little. The shelf was empty by midweek, and many customers '
+                'left without buying anything.'
+            ),
             'score': 0,
             'next_action': 'restart',
         },
@@ -105,7 +134,10 @@ def seed_level_one(apps, schema_editor):
             'rule_name': 'fail_300',
             'condition_json': {'selected_value': 300},
             'is_success': False,
-            'message': '很遗憾，下周网红热度消退，加上雨天客流下降，大量草莓直接烂在了货架上。',
+            'message': (
+                'Unfortunately, the influencer buzz faded and rainy weather reduced store traffic. Too many '
+                'strawberries were left unsold and spoiled on the shelf.'
+            ),
             'score': 0,
             'next_action': 'restart',
         },

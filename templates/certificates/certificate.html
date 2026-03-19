@@ -1,9 +1,347 @@
 {% extends "core/base.html" %}
-{% block title %}结业证书{% endblock %}
+{% block title %}Certificate{% endblock %}
+
+{% block extra_css %}
+<style>
+    .certificate-page {
+        padding: 40px 24px 72px;
+    }
+    .certificate-wrap {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+    }
+    .certificate-card {
+        position: relative;
+        background: linear-gradient(180deg, #fffdf8 0%, #fff7ea 100%);
+        border: 1px solid rgba(99, 86, 71, 0.16);
+        border-radius: 32px;
+        box-shadow: 0 28px 60px rgba(57, 38, 15, 0.12);
+        overflow: hidden;
+        padding: 56px;
+    }
+    .certificate-card::before,
+    .certificate-card::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.2;
+    }
+    .certificate-card::before {
+        width: 360px;
+        height: 360px;
+        right: -80px;
+        top: -140px;
+        background: #f3c15d;
+    }
+    .certificate-card::after {
+        width: 300px;
+        height: 300px;
+        left: -110px;
+        bottom: -140px;
+        background: #7dbb95;
+    }
+    .certificate-inner {
+        position: relative;
+        z-index: 1;
+        border: 2px solid rgba(217, 107, 39, 0.24);
+        border-radius: 24px;
+        padding: 44px;
+        background: rgba(255, 255, 255, 0.6);
+    }
+    .certificate-kicker {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(217, 107, 39, 0.12);
+        color: #ab4d13;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .certificate-title {
+        margin: 18px 0 12px;
+        font-size: 48px;
+        line-height: 1.05;
+    }
+    .certificate-subtitle {
+        margin: 0;
+        color: #6f6255;
+        font-size: 18px;
+        line-height: 1.7;
+    }
+    .certificate-body {
+        margin-top: 28px;
+        padding: 28px 0;
+        border-top: 1px solid rgba(99, 86, 71, 0.16);
+        border-bottom: 1px solid rgba(99, 86, 71, 0.16);
+    }
+    .certificate-body p {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.9;
+        color: #2f2418;
+    }
+    .certificate-score {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 28px;
+    }
+    .score-card {
+        padding: 18px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(99, 86, 71, 0.12);
+    }
+    .score-card strong {
+        display: block;
+        font-size: 14px;
+        color: #6f6255;
+        margin-bottom: 8px;
+    }
+    .score-card span {
+        font-size: 28px;
+        font-weight: 700;
+    }
+    .certificate-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        margin-top: 28px;
+        color: #6f6255;
+        font-size: 14px;
+    }
+    .certificate-breakdown {
+        margin-top: 24px;
+        padding: 22px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid rgba(99, 86, 71, 0.12);
+    }
+    .certificate-breakdown h3 {
+        margin: 0 0 8px;
+        font-size: 20px;
+    }
+    .certificate-breakdown p {
+        margin: 0 0 16px;
+        color: #6f6255;
+        line-height: 1.6;
+    }
+    .breakdown-list {
+        display: grid;
+        gap: 10px;
+    }
+    .breakdown-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 0.7fr));
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(255, 248, 239, 0.82);
+        color: #2f2418;
+    }
+    .breakdown-row strong {
+        font-size: 15px;
+    }
+    .breakdown-row span {
+        color: #6f6255;
+        text-align: right;
+    }
+    .certificate-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+    .certificate-note {
+        margin-top: 14px;
+        color: #6f6255;
+        font-size: 14px;
+    }
+    @media (max-width: 900px) {
+        .certificate-card,
+        .certificate-inner {
+            padding: 28px;
+        }
+        .certificate-score {
+            grid-template-columns: 1fr;
+        }
+        .certificate-meta {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div style="max-width:900px; margin:40px auto; background:#fff; padding:40px; border-radius:12px;">
-    <h1>实习经理结业证书</h1>
-    <p>恭喜你完成全部关卡！</p>
+<div class="certificate-page">
+    <div class="certificate-wrap">
+        <div id="certificate-card" class="certificate-card">
+            <div class="certificate-inner">
+                <span class="certificate-kicker">Completion Certificate</span>
+                <h1 class="certificate-title">Internship Manager Graduation Certificate</h1>
+                <p class="certificate-subtitle">Awarded to the trainee manager who completed the current supermarket decision-making challenge and demonstrated data-informed operational judgment.</p>
+
+                <div class="certificate-body">
+                    <p>
+                        This certifies that the trainee manager has completed the full operational practice journey,
+                        cleared all available levels, and demonstrated the ability to interpret evidence, filter noise,
+                        and support business decisions with data.
+                    </p>
+                </div>
+
+                <div class="certificate-score">
+                    <div class="score-card">
+                        <strong>Levels Cleared</strong>
+                        <span>{{ available_levels }}</span>
+                    </div>
+                    <div class="score-card">
+                        <strong>Final Score</strong>
+                        <span id="final-score-value">{{ final_score }}</span>
+                    </div>
+                    <div class="score-card">
+                        <strong>Maximum Score</strong>
+                        <span>{{ max_score }}</span>
+                    </div>
+                    <div class="score-card">
+                        <strong>Total Attempts</strong>
+                        <span id="total-attempts-value">0</span>
+                    </div>
+                </div>
+
+                <div class="certificate-breakdown">
+                    <h3>Performance Breakdown</h3>
+                    <p>{{ score_rule }}</p>
+                    <div id="level-breakdown" class="breakdown-list"></div>
+                </div>
+
+                <div class="certificate-meta">
+                    <div>Issued on {{ issued_at }}</div>
+                    <div>Product: Supermarket Manager Internship</div>
+                    <div>Institution mark placeholder</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="certificate-actions">
+            <button id="save-certificate-btn" class="solid-btn" type="button">Save as PNG</button>
+            <button id="play-again-btn" class="ghost-btn" type="button" style="color:#251c13; background:rgba(37, 28, 19, 0.08);">Play Again</button>
+            <a href="/" class="ghost-btn" style="display:inline-flex; align-items:center; color:#251c13; background:rgba(37, 28, 19, 0.08);">Back Home</a>
+        </div>
+        <div id="save-status" class="certificate-note">Save the certificate as a PNG image directly from your browser.</div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const totalLevels = {{ available_levels }};
+
+function getSavedNumber(key) {
+    const value = Number(localStorage.getItem(key) || '0');
+    return Number.isNaN(value) ? 0 : value;
+}
+
+function buildCertificateStats() {
+    const breakdown = [];
+
+    for (let level = 1; level <= totalLevels; level += 1) {
+        breakdown.push({
+            level,
+            attempts: getSavedNumber(`level_${level}_attempts`),
+            score: getSavedNumber(`level_${level}_score`)
+        });
+    }
+
+    return breakdown;
+}
+
+function renderCertificateStats() {
+    const breakdown = buildCertificateStats();
+    const finalScore = breakdown.reduce((sum, item) => sum + item.score, 0);
+    const totalAttempts = breakdown.reduce((sum, item) => sum + item.attempts, 0);
+    const breakdownContainer = document.getElementById('level-breakdown');
+
+    document.getElementById('final-score-value').textContent = String(finalScore);
+    document.getElementById('total-attempts-value').textContent = String(totalAttempts);
+
+    breakdownContainer.innerHTML = '';
+    breakdown.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'breakdown-row';
+        row.innerHTML = `
+            <strong>Level ${item.level}</strong>
+            <span>Attempts: ${item.attempts || 0}</span>
+            <span>Score: ${item.score}/50</span>
+        `;
+        breakdownContainer.appendChild(row);
+    });
+}
+
+renderCertificateStats();
+
+document.getElementById('play-again-btn').addEventListener('click', function () {
+    localStorage.clear();
+    window.location.href = '/story/opening/';
+});
+
+document.getElementById('save-certificate-btn').addEventListener('click', async function () {
+    const status = document.getElementById('save-status');
+    const card = document.getElementById('certificate-card');
+    const rect = card.getBoundingClientRect();
+    const clone = card.cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+
+    function copyStyles(sourceNode, targetNode) {
+        const computed = window.getComputedStyle(sourceNode);
+        for (const property of computed) {
+            targetNode.style.setProperty(
+                property,
+                computed.getPropertyValue(property),
+                computed.getPropertyPriority(property)
+            );
+        }
+
+        Array.from(sourceNode.children).forEach((child, index) => {
+            copyStyles(child, targetNode.children[index]);
+        });
+    }
+
+    copyStyles(card, clone);
+
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(rect.width)}" height="${Math.ceil(rect.height)}">
+            <foreignObject width="100%" height="100%">${new XMLSerializer().serializeToString(clone)}</foreignObject>
+        </svg>
+    `;
+
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+
+    image.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.ceil(rect.width * 2);
+        canvas.height = Math.ceil(rect.height * 2);
+        const context = canvas.getContext('2d');
+        context.setTransform(2, 0, 0, 2, 0, 0);
+        context.drawImage(image, 0, 0);
+        URL.revokeObjectURL(url);
+
+        const link = document.createElement('a');
+        link.download = 'internship-manager-certificate.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        status.textContent = 'Certificate downloaded as PNG.';
+    };
+
+    image.onerror = function () {
+        URL.revokeObjectURL(url);
+        status.textContent = 'PNG export failed in this browser session. Please try again or use a manual screenshot.';
+    };
+
+    image.src = url;
+});
+</script>
 {% endblock %}

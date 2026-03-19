@@ -5,6 +5,10 @@ class Level(models.Model):
     level_code = models.CharField(max_length=50, unique=True)
     title = models.CharField(max_length=200)
     description = models.TextField()
+    objective_text = models.TextField(blank=True)
+    briefing_title = models.CharField(max_length=200, blank=True)
+    briefing_text = models.TextField(blank=True)
+    briefing_hint = models.TextField(blank=True)
     order = models.PositiveIntegerField(unique=True)
     is_active = models.BooleanField(default=True)
 

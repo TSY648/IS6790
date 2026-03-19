@@ -28,21 +28,6 @@
         flex-direction: column;
     }
 
-    .tab-bar {
-        min-height: 48px;
-        display: flex;
-        gap: 8px;
-        margin-bottom: 12px;
-        flex-wrap: wrap;
-    }
-
-    .tab {
-        background: #e5e7eb;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 14px;
-    }
-
     .canvas-area {
         flex: 1;
         background: #f8fafc;
@@ -59,6 +44,14 @@
         font-weight: bold;
     }
 
+    .category-block.tutorial-focus {
+        position: relative;
+        z-index: 120;
+        border-radius: 14px;
+        box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.95), 0 0 28px rgba(255, 209, 102, 0.45);
+        background: rgba(255, 248, 225, 0.92);
+    }
+
     .item-btn {
         display: block;
         width: 100%;
@@ -70,8 +63,9 @@
         text-align: left;
     }
 
-    .item-btn.read {
-        background: #d1fae5;
+    .item-btn.active {
+        background: #dbeafe;
+        border: 1px solid #60a5fa;
     }
 
     .decision-btn {
@@ -82,15 +76,7 @@
         border-radius: 10px;
         font-size: 16px;
         color: white;
-        background: #9ca3af;
-    }
-
-    .decision-btn.enabled {
         background: #2563eb;
-    }
-
-    .hidden {
-        display: none;
     }
 
     .choice-box label {
@@ -107,6 +93,10 @@
         justify-content: center;
     }
 
+    .result-modal.hidden {
+        display: none;
+    }
+
     .result-content {
         background: white;
         width: 520px;
@@ -114,50 +104,115 @@
         border-radius: 12px;
         padding: 24px;
     }
+
+    .primary-action {
+        margin-top: 16px;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-size: 15px;
+    }
+
+    .tutorial-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 110;
+        background: rgba(20, 20, 20, 0.58);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .tutorial-overlay.hidden {
+        display: none;
+    }
+
+    .tutorial-card {
+        width: min(560px, 100%);
+        background: white;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+    }
+
+    .tutorial-card h3 {
+        margin: 0 0 8px;
+    }
+
+    .tutorial-card p {
+        margin: 0;
+        line-height: 1.6;
+        color: #4b5563;
+    }
+
+    .tutorial-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 18px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="game-layout">
     <aside class="panel left-panel">
-        <p>关卡 {{ level.order }}/7</p>
+        <p>Level {{ level.order }}/{{ total_levels }}</p>
         <h2 id="level-title">{{ level.title }}</h2>
         <p id="level-desc">{{ level.description }}</p>
         <hr>
-        <h3>任务目标</h3>
-        <p>找出影响草莓销量的关键信息，并决定下周最佳订货量。</p>
+        <h3>Mission Objective</h3>
+        <p>{{ level.objective_text|default:level.description }}</p>
     </aside>
 
     <main class="panel center-panel">
-        <div id="tab-bar" class="tab-bar"></div>
         <div id="canvas-area" class="canvas-area">
-            <h3>门店现场</h3>
-            <p>欢迎来到关卡 1。请先从右侧查看不同来源的信息。</p>
-            <p>你需要区分真正有用的信号和可能造成误导的噪音。</p>
+            <h3>{{ level.briefing_title|default:"Scenario Brief" }}</h3>
+            <p>{{ level.briefing_text|default:"Start by reviewing the information sources on the right." }}</p>
+            <p>{{ level.briefing_hint|default:"Your goal is to separate meaningful signals from distracting noise." }}</p>
         </div>
     </main>
 
     <aside class="panel right-panel">
-        <h3>信息入口</h3>
+        <h3>Information Sources</h3>
 
-        <div class="category-title">NPC</div>
-        <div id="group-npc"></div>
+        <div id="category-npc" class="category-block">
+            <div class="category-title">NPC</div>
+            <div id="group-npc"></div>
+        </div>
 
-        <div class="category-title">报表</div>
-        <div id="group-report"></div>
+        <div id="category-report" class="category-block">
+            <div class="category-title">Reports</div>
+            <div id="group-report"></div>
+        </div>
 
-        <div class="category-title">外部信息</div>
-        <div id="group-external"></div>
+        <div id="category-external" class="category-block">
+            <div class="category-title">External Info</div>
+            <div id="group-external"></div>
+        </div>
 
-        <button id="decision-btn" class="decision-btn" disabled>提交决策</button>
+        <button id="decision-btn" class="decision-btn" type="button">Go to make decision</button>
     </aside>
 </div>
 
 <div id="result-modal" class="result-modal hidden">
     <div class="result-content">
-        <h3>结果反馈</h3>
+        <h3>Result</h3>
         <p id="result-message"></p>
-        <button id="result-action-btn">确定</button>
+        <p id="result-score" style="margin:12px 0 0; color:#4b5563;"></p>
+        <button id="result-action-btn" type="button">OK</button>
+    </div>
+</div>
+
+<div id="tutorial-overlay" class="tutorial-overlay hidden">
+    <div class="tutorial-card">
+        <h3 id="tutorial-title">Level 1 Tutorial</h3>
+        <p id="tutorial-text"></p>
+        <div class="tutorial-actions">
+            <button id="tutorial-next-btn" class="primary-action" type="button">Next</button>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -166,36 +221,79 @@
 <script>
 const levelOrder = {{ level.order }};
 let levelConfig = null;
-let readItems = JSON.parse(localStorage.getItem(`level_${levelOrder}_read_items`) || '[]');
+let activeItemCode = null;
+let tutorialStepIndex = 0;
 
-const tabBar = document.getElementById('tab-bar');
 const canvasArea = document.getElementById('canvas-area');
 const decisionBtn = document.getElementById('decision-btn');
 const resultModal = document.getElementById('result-modal');
 const resultMessage = document.getElementById('result-message');
+const resultScore = document.getElementById('result-score');
 const resultActionBtn = document.getElementById('result-action-btn');
+const tutorialOverlay = document.getElementById('tutorial-overlay');
+const tutorialTitle = document.getElementById('tutorial-title');
+const tutorialText = document.getElementById('tutorial-text');
+const tutorialNextBtn = document.getElementById('tutorial-next-btn');
 
-function saveReadItems() {
-    localStorage.setItem(`level_${levelOrder}_read_items`, JSON.stringify(readItems));
+const tutorialSteps = [
+    {
+        title: 'Meet the NPCs',
+        text: 'Start with the NPC panel. Conversations often reveal assumptions, motivations, and early clues about what might be signal or noise.',
+        targetId: 'category-npc',
+    },
+    {
+        title: 'Read the Reports',
+        text: 'Reports give you the structured evidence. Open them when you want a clearer view of trends instead of relying on instinct alone.',
+        targetId: 'category-report',
+    },
+    {
+        title: 'Check External Info',
+        text: 'External information helps explain what is happening around the store, such as weather, social buzz, or shifting customer behavior.',
+        targetId: 'category-external',
+    },
+    {
+        title: 'Make the Decision',
+        text: 'When you are ready, open the decision panel and choose the order quantity that best fits the evidence you reviewed.',
+        targetId: 'decision-btn',
+    },
+];
+
+function renderBriefing() {
+    canvasArea.innerHTML = `
+        <h3>{{ level.briefing_title|default:"Scenario Brief"|escapejs }}</h3>
+        <p>{{ level.briefing_text|default:"Start by reviewing the information sources on the right."|escapejs }}</p>
+        <p>{{ level.briefing_hint|default:"Your goal is to separate meaningful signals from distracting noise."|escapejs }}</p>
+    `;
 }
 
 function renderItemContent(item) {
-    const existingTab = document.getElementById(`tab-${item.item_code}`);
-    if (!existingTab) {
-        const tab = document.createElement('div');
-        tab.className = 'tab';
-        tab.id = `tab-${item.item_code}`;
-        tab.textContent = item.title;
-        tabBar.appendChild(tab);
-    }
-
     let html = `<h3>${item.title}</h3>`;
 
-    if (item.content_type === 'chart') {
+    if (item.content_type === 'table') {
+        html += `<p>${item.content_text}</p>`;
+        if (item.content_json.headers && item.content_json.rows) {
+            html += '<table border="1" cellpadding="8" cellspacing="0">';
+            html += '<tr>';
+            item.content_json.headers.forEach((header) => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr>';
+            item.content_json.rows.forEach((row) => {
+                html += '<tr>';
+                row.forEach((cell) => {
+                    html += `<td>${cell}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+        }
+    } else if (item.content_type === 'chart') {
         html += `<p>${item.content_text}</p>`;
         if (item.content_json.x && item.content_json.y) {
+            const xLabel = item.content_json.x_label || 'Period';
+            const yLabel = item.content_json.y_label || 'Value';
             html += '<table border="1" cellpadding="8" cellspacing="0">';
-            html += '<tr><th>周次</th><th>销量</th></tr>';
+            html += `<tr><th>${xLabel}</th><th>${yLabel}</th></tr>`;
             item.content_json.x.forEach((x, index) => {
                 html += `<tr><td>${x}</td><td>${item.content_json.y[index]}</td></tr>`;
             });
@@ -206,18 +304,6 @@ function renderItemContent(item) {
     }
 
     canvasArea.innerHTML = html;
-
-    if (!readItems.includes(item.item_code)) {
-        readItems.push(item.item_code);
-        saveReadItems();
-    }
-
-    const btn = document.getElementById(`btn-${item.item_code}`);
-    if (btn) {
-        btn.classList.add('read');
-    }
-
-    checkDecisionUnlock();
 }
 
 function renderDecisionPanel() {
@@ -240,7 +326,7 @@ function renderDecisionPanel() {
 
     html += `
         </div>
-        <button id="confirm-submit-btn">确认提交</button>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Confirm Submission</button>
     `;
 
     canvasArea.innerHTML = html;
@@ -248,51 +334,129 @@ function renderDecisionPanel() {
     document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
 }
 
-function checkDecisionUnlock() {
-    const keyItems = levelConfig.items.filter((item) => item.is_key_item).map((item) => item.item_code);
-    const allRead = keyItems.every((code) => readItems.includes(code));
+function clearTutorialFocus() {
+    document.querySelectorAll('.tutorial-focus').forEach((element) => {
+        element.classList.remove('tutorial-focus');
+    });
+}
 
-    if (allRead) {
-        decisionBtn.disabled = false;
-        decisionBtn.classList.add('enabled');
+function renderTutorialStep() {
+    const step = tutorialSteps[tutorialStepIndex];
+    if (!step) {
+        tutorialOverlay.classList.add('hidden');
+        clearTutorialFocus();
+        localStorage.setItem('level_1_tutorial_seen', 'true');
+        return;
     }
+
+    tutorialTitle.textContent = step.title;
+    tutorialText.textContent = step.text;
+    tutorialNextBtn.textContent = tutorialStepIndex === tutorialSteps.length - 1 ? 'Finish' : 'Next';
+
+    clearTutorialFocus();
+    const target = document.getElementById(step.targetId);
+    if (target) {
+        target.classList.add('tutorial-focus');
+    }
+}
+
+function maybeStartTutorial() {
+    if (levelOrder !== 1) {
+        return;
+    }
+    if (localStorage.getItem('level_1_tutorial_seen') === 'true') {
+        return;
+    }
+
+    tutorialStepIndex = 0;
+    tutorialOverlay.classList.remove('hidden');
+    renderTutorialStep();
+}
+
+function getLevelAttempts() {
+    const savedAttempts = Number(localStorage.getItem(`level_${levelOrder}_attempts`) || '0');
+    return Number.isNaN(savedAttempts) ? 0 : savedAttempts;
+}
+
+function saveLevelAttempts(attemptCount) {
+    localStorage.setItem(`level_${levelOrder}_attempts`, String(attemptCount));
+}
+
+function saveLevelScore(score) {
+    localStorage.setItem(`level_${levelOrder}_score`, String(score));
+}
+
+function buildResultScoreText(data) {
+    if (data.success) {
+        return `Score earned: ${data.awarded_score}/${data.max_score}. Cleared on attempt ${data.attempt_count}.`;
+    }
+
+    return `No points awarded yet. ${data.score_rule}`;
 }
 
 async function submitDecision() {
     const selected = document.querySelector('input[name="decision_value"]:checked');
     if (!selected) {
-        alert('请先选择订货量');
+        alert('Please choose an option first.');
         return;
     }
 
-    const selectedValue = Number(selected.value);
+    const parsedNumber = Number(selected.value);
+    const selectedValue = Number.isNaN(parsedNumber) ? selected.value : parsedNumber;
+    const attemptCount = getLevelAttempts() + 1;
 
-    const response = await fetch(`/levels/${levelOrder}/submit/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ selected_value: selectedValue })
-    });
+    try {
+        const response = await fetch(`/levels/${levelOrder}/submit/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                selected_value: selectedValue,
+                attempt_count: attemptCount
+            })
+        });
 
-    const data = await response.json();
-    resultMessage.textContent = data.message;
-    resultModal.classList.remove('hidden');
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || 'Unable to submit the decision right now.');
+        }
 
-    if (data.success) {
-        resultActionBtn.textContent = '进入下一关';
-        localStorage.setItem('current_level', String(levelOrder + 1));
-        localStorage.setItem(`level_${levelOrder}_passed`, 'true');
-        resultActionBtn.onclick = () => {
-            window.location.href = `/levels/${levelOrder + 1}/`;
-        };
-    } else {
-        resultActionBtn.textContent = '重新开始本关';
-        localStorage.removeItem(`level_${levelOrder}_read_items`);
-        resultActionBtn.onclick = () => {
-            window.location.reload();
-        };
+        saveLevelAttempts(attemptCount);
+        resultMessage.textContent = data.message;
+        resultScore.textContent = buildResultScoreText(data);
+        resultModal.classList.remove('hidden');
+
+        if (data.success) {
+            resultActionBtn.textContent = data.action_label || 'Continue';
+            saveLevelScore(data.awarded_score || 0);
+            localStorage.setItem(`level_${levelOrder}_passed`, 'true');
+            if (data.next_action === 'next_level' && data.next_level_order) {
+                localStorage.setItem('current_level', String(data.next_level_order));
+                localStorage.removeItem('game_completed');
+            }
+            if (data.next_action === 'certificate') {
+                localStorage.setItem('game_completed', 'true');
+                localStorage.removeItem('current_level');
+            }
+            resultActionBtn.onclick = () => {
+                window.location.href = data.next_url || '/certificate/';
+            };
+        } else {
+            resultActionBtn.textContent = data.action_label || 'Retry Level';
+            localStorage.removeItem(`level_${levelOrder}_score`);
+            localStorage.setItem('current_level', String(levelOrder));
+            resultActionBtn.onclick = () => {
+                if (data.next_action === 'restart') {
+                    window.location.href = data.next_url || `/levels/${levelOrder}/`;
+                } else {
+                    window.location.reload();
+                }
+            };
+        }
+    } catch (error) {
+        alert(error.message || 'Submission failed. Please refresh the page and try again.');
     }
 }
 
@@ -316,14 +480,30 @@ function createItemButton(item) {
     btn.id = `btn-${item.item_code}`;
     btn.className = 'item-btn';
     btn.textContent = item.title;
+    btn.type = 'button';
+    btn.addEventListener('click', () => {
+        const wasActive = activeItemCode === item.item_code;
+        document.querySelectorAll('.item-btn').forEach((button) => {
+            button.classList.remove('active');
+        });
 
-    if (readItems.includes(item.item_code)) {
-        btn.classList.add('read');
-    }
+        if (wasActive) {
+            activeItemCode = null;
+            renderBriefing();
+            return;
+        }
 
-    btn.addEventListener('click', () => renderItemContent(item));
+        activeItemCode = item.item_code;
+        btn.classList.add('active');
+        renderItemContent(item);
+    });
     return btn;
 }
+
+tutorialNextBtn.addEventListener('click', () => {
+    tutorialStepIndex += 1;
+    renderTutorialStep();
+});
 
 async function initLevel() {
     const response = await fetch(`/levels/${levelOrder}/config/`);
@@ -341,13 +521,15 @@ async function initLevel() {
         }
     });
 
-    checkDecisionUnlock();
-
     decisionBtn.addEventListener('click', () => {
-        if (!decisionBtn.disabled) {
-            renderDecisionPanel();
-        }
+        activeItemCode = null;
+        document.querySelectorAll('.item-btn').forEach((button) => {
+            button.classList.remove('active');
+        });
+        renderDecisionPanel();
     });
+
+    maybeStartTutorial();
 }
 
 initLevel();

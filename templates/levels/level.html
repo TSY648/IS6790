@@ -373,6 +373,17 @@ function maybeStartTutorial() {
     renderTutorialStep();
 }
 
+function restartTutorial() {
+    if (levelOrder !== 1) {
+        return;
+    }
+
+    tutorialStepIndex = 0;
+    localStorage.removeItem('level_1_tutorial_seen');
+    tutorialOverlay.classList.remove('hidden');
+    renderTutorialStep();
+}
+
 function getLevelAttempts() {
     const savedAttempts = Number(localStorage.getItem(`level_${levelOrder}_attempts`) || '0');
     return Number.isNaN(savedAttempts) ? 0 : savedAttempts;
@@ -503,6 +514,10 @@ function createItemButton(item) {
 tutorialNextBtn.addEventListener('click', () => {
     tutorialStepIndex += 1;
     renderTutorialStep();
+});
+
+window.addEventListener('replay-level-tutorial', () => {
+    restartTutorial();
 });
 
 async function initLevel() {

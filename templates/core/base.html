@@ -252,6 +252,9 @@
                 </div>
             </div>
             <div class="modal-actions">
+                {% if level and level.order == 1 %}
+                <button id="replay-tutorial-btn" class="ghost-btn" type="button" style="background:rgba(37, 28, 19, 0.08); color:#251c13;">Replay Tutorial</button>
+                {% endif %}
                 <button id="close-help-btn" class="solid-btn" type="button">Close</button>
             </div>
         </div>
@@ -262,6 +265,7 @@
         const helpModal = document.getElementById('help-modal');
         const openHelpBtn = document.getElementById('open-help-btn');
         const closeHelpBtn = document.getElementById('close-help-btn');
+        const replayTutorialBtn = document.getElementById('replay-tutorial-btn');
 
         function closeHelp() {
             helpModal.classList.add('hidden');
@@ -277,6 +281,13 @@
                 closeHelp();
             }
         });
+
+        if (replayTutorialBtn) {
+            replayTutorialBtn.addEventListener('click', () => {
+                closeHelp();
+                window.dispatchEvent(new CustomEvent('replay-level-tutorial'));
+            });
+        }
     })();
     </script>
 

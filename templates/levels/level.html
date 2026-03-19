@@ -153,6 +153,73 @@
         justify-content: flex-end;
         margin-top: 18px;
     }
+
+    .entry-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 115;
+        background: rgba(20, 20, 20, 0.62);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .entry-overlay.hidden {
+        display: none;
+    }
+
+    .entry-card {
+        width: min(620px, 100%);
+        background: white;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+    }
+
+    .entry-card h3 {
+        margin: 0 0 12px;
+        font-size: 28px;
+    }
+
+    .entry-card p {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.7;
+    }
+
+    .entry-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 22px;
+    }
+
+    .entry-actions .primary-action,
+    .entry-actions .secondary-action {
+        width: 100%;
+        min-height: 52px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin-top: 0;
+    }
+
+    .secondary-action {
+        padding: 12px 18px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #111827;
+        font-size: 15px;
+    }
+
+    @media (max-width: 720px) {
+        .entry-actions {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -215,6 +282,17 @@
         </div>
     </div>
 </div>
+
+<div id="entry-overlay" class="entry-overlay hidden">
+    <div class="entry-card">
+        <h3 id="entry-title">Store Manager</h3>
+        <p id="entry-text">Yesterday demand exploded. We should double the order quantity right now and move fast.</p>
+        <div class="entry-actions">
+            <button id="accept-suggestion-btn" class="primary-action" type="button">Accept Suggestion and Order Now</button>
+            <button id="investigate-first-btn" class="secondary-action" type="button">I Want to Look Into the Cause First</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -223,6 +301,7 @@ const levelOrder = {{ level.order }};
 let levelConfig = null;
 let activeItemCode = null;
 let tutorialStepIndex = 0;
+let levelOnePath = null;
 
 const canvasArea = document.getElementById('canvas-area');
 const decisionBtn = document.getElementById('decision-btn');
@@ -234,27 +313,27 @@ const tutorialOverlay = document.getElementById('tutorial-overlay');
 const tutorialTitle = document.getElementById('tutorial-title');
 const tutorialText = document.getElementById('tutorial-text');
 const tutorialNextBtn = document.getElementById('tutorial-next-btn');
+const entryOverlay = document.getElementById('entry-overlay');
+const entryTitle = document.getElementById('entry-title');
+const entryText = document.getElementById('entry-text');
+const acceptSuggestionBtn = document.getElementById('accept-suggestion-btn');
+const investigateFirstBtn = document.getElementById('investigate-first-btn');
 
 const tutorialSteps = [
     {
-        title: 'Meet the NPCs',
-        text: 'Start with the NPC panel. Conversations often reveal assumptions, motivations, and early clues about what might be signal or noise.',
+        title: 'NPC Panel',
+        text: 'NPCs give you people-based context. Their comments reveal assumptions, pressure, and early clues, but they are not enough on their own.',
         targetId: 'category-npc',
     },
     {
-        title: 'Read the Reports',
-        text: 'Reports give you the structured evidence. Open them when you want a clearer view of trends instead of relying on instinct alone.',
+        title: 'Reports Panel',
+        text: 'Reports hold the structured evidence. Use them to verify what is really happening before you trust anyone\'s intuition.',
         targetId: 'category-report',
     },
     {
-        title: 'Check External Info',
-        text: 'External information helps explain what is happening around the store, such as weather, social buzz, or shifting customer behavior.',
+        title: 'External Info Panel',
+        text: 'External information explains surrounding conditions such as weather and social buzz. These signals help you judge whether a spike is sustainable or temporary.',
         targetId: 'category-external',
-    },
-    {
-        title: 'Make the Decision',
-        text: 'When you are ready, open the decision panel and choose the order quantity that best fits the evidence you reviewed.',
-        targetId: 'decision-btn',
     },
 ];
 
@@ -286,6 +365,19 @@ function renderItemContent(item) {
                 html += '</tr>';
             });
             html += '</table>';
+        }
+    } else if (item.content_type === 'image') {
+        const imageSrc = item.content_json.src || '';
+        const imageAlt = item.content_json.alt || item.title;
+        html += `<p>${item.content_text}</p>`;
+        if (imageSrc) {
+            html += `
+                <img
+                    src="${imageSrc}"
+                    alt="${imageAlt}"
+                    style="max-width:100%; border:1px solid #d1d5db; border-radius:12px; background:white;"
+                >
+            `;
         }
     } else if (item.content_type === 'chart') {
         html += `<p>${item.content_text}</p>`;
@@ -345,7 +437,6 @@ function renderTutorialStep() {
     if (!step) {
         tutorialOverlay.classList.add('hidden');
         clearTutorialFocus();
-        localStorage.setItem('level_1_tutorial_seen', 'true');
         return;
     }
 
@@ -360,14 +451,7 @@ function renderTutorialStep() {
     }
 }
 
-function maybeStartTutorial() {
-    if (levelOrder !== 1) {
-        return;
-    }
-    if (localStorage.getItem('level_1_tutorial_seen') === 'true') {
-        return;
-    }
-
+function startTutorial() {
     tutorialStepIndex = 0;
     tutorialOverlay.classList.remove('hidden');
     renderTutorialStep();
@@ -378,10 +462,26 @@ function restartTutorial() {
         return;
     }
 
-    tutorialStepIndex = 0;
-    localStorage.removeItem('level_1_tutorial_seen');
-    tutorialOverlay.classList.remove('hidden');
-    renderTutorialStep();
+    startTutorial();
+}
+
+function showLevelOneEntryPrompt() {
+    if (levelOrder !== 1) {
+        return;
+    }
+
+    const managerItem = levelConfig.items.find((item) => item.item_code === 'npc_manager');
+    entryTitle.textContent = managerItem ? managerItem.title : 'Store Manager';
+    entryText.textContent = managerItem ? managerItem.content_text : 'Yesterday demand exploded. We should double the order quantity right now and move fast.';
+    entryOverlay.classList.remove('hidden');
+}
+
+function openDecisionPanel() {
+    activeItemCode = null;
+    document.querySelectorAll('.item-btn').forEach((button) => {
+        button.classList.remove('active');
+    });
+    renderDecisionPanel();
 }
 
 function getLevelAttempts() {
@@ -425,7 +525,8 @@ async function submitDecision() {
             },
             body: JSON.stringify({
                 selected_value: selectedValue,
-                attempt_count: attemptCount
+                attempt_count: attemptCount,
+                level_one_path: levelOnePath
             })
         });
 
@@ -520,6 +621,18 @@ window.addEventListener('replay-level-tutorial', () => {
     restartTutorial();
 });
 
+acceptSuggestionBtn.addEventListener('click', () => {
+    levelOnePath = 'accept_manager';
+    entryOverlay.classList.add('hidden');
+    openDecisionPanel();
+});
+
+investigateFirstBtn.addEventListener('click', () => {
+    levelOnePath = 'investigate_first';
+    entryOverlay.classList.add('hidden');
+    startTutorial();
+});
+
 async function initLevel() {
     const response = await fetch(`/levels/${levelOrder}/config/`);
     levelConfig = await response.json();
@@ -536,15 +649,11 @@ async function initLevel() {
         }
     });
 
-    decisionBtn.addEventListener('click', () => {
-        activeItemCode = null;
-        document.querySelectorAll('.item-btn').forEach((button) => {
-            button.classList.remove('active');
-        });
-        renderDecisionPanel();
-    });
+    decisionBtn.addEventListener('click', openDecisionPanel);
 
-    maybeStartTutorial();
+    if (levelOrder === 1) {
+        showLevelOneEntryPrompt();
+    }
 }
 
 initLevel();

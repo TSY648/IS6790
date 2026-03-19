@@ -84,7 +84,7 @@ def refresh_levels_one_and_two(apps, schema_editor):
             'level_code': 'level_1',
             'order': 1,
             'title': 'Fresh Produce Waste Crisis',
-            'description': 'Use loss attribution evidence to set a safer strawberry order and cut spoilage before it happens again.',
+            'description': 'Determine the optimal order quantity for strawberries and achieve a turnaround in the profitability of this category.',
             'objective_text': 'Review the right report, compare DOC against shelf life, and choose the strawberry order quantity that protects both availability and profit.',
             'briefing_title': 'Fresh Produce Control Room',
             'briefing_text': 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.',

@@ -8,7 +8,7 @@
         grid-template-columns: 280px 1fr 320px;
         gap: 16px;
         padding: 16px;
-        height: calc(100vh - 64px);
+        min-height: calc(100vh - 64px);
     }
 
     .panel {
@@ -35,6 +35,26 @@
         padding: 20px;
         overflow: auto;
         border: 1px solid #e5e7eb;
+    }
+
+    .briefing-hero {
+        width: 100%;
+        height: 100%;
+    }
+
+    .briefing-hero-image {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid #dbe4ef;
+        background: linear-gradient(180deg, #ffffff 0%, #eef5fb 100%);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
+        overflow: hidden;
+    }
+
+    .briefing-hero-image img {
+        display: block;
+        width: 100%;
+        height: auto;
     }
 
     .category-title {
@@ -216,6 +236,11 @@
     }
 
     @media (max-width: 720px) {
+        .game-layout {
+            grid-template-columns: 1fr;
+            height: auto;
+        }
+
         .entry-actions {
             grid-template-columns: 1fr;
         }
@@ -236,9 +261,11 @@
 
     <main class="panel center-panel">
         <div id="canvas-area" class="canvas-area">
-            <h3>{{ level.briefing_title|default:"Scenario Brief" }}</h3>
-            <p>{{ level.briefing_text|default:"Start by reviewing the information sources on the right." }}</p>
-            <p>{{ level.briefing_hint|default:"Your goal is to separate meaningful signals from distracting noise." }}</p>
+            <div class="briefing-hero">
+                <div class="briefing-hero-image">
+                    <img src="/static/levels/level1/supermarket.jpg" alt="Supermarket manager office illustration">
+                </div>
+            </div>
         </div>
     </main>
 
@@ -246,7 +273,7 @@
         <h3>Information Sources</h3>
 
         <div id="category-npc" class="category-block">
-            <div class="category-title">NPC</div>
+            <div class="category-title">Colleagues</div>
             <div id="group-npc"></div>
         </div>
 
@@ -321,8 +348,8 @@ const investigateFirstBtn = document.getElementById('investigate-first-btn');
 
 const tutorialSteps = [
     {
-        title: 'NPC Panel',
-        text: 'NPCs give you people-based context. Their comments reveal assumptions, pressure, and early clues, but they are not enough on their own.',
+        title: 'Colleagues Panel',
+        text: 'Your colleagues give you people-based clues. Their comments can help you spot pressure, assumptions, and early hints, but you still need evidence before you decide.',
         targetId: 'category-npc',
     },
     {
@@ -339,9 +366,11 @@ const tutorialSteps = [
 
 function renderBriefing() {
     canvasArea.innerHTML = `
-        <h3>{{ level.briefing_title|default:"Scenario Brief"|escapejs }}</h3>
-        <p>{{ level.briefing_text|default:"Start by reviewing the information sources on the right."|escapejs }}</p>
-        <p>{{ level.briefing_hint|default:"Your goal is to separate meaningful signals from distracting noise."|escapejs }}</p>
+        <div class="briefing-hero">
+            <div class="briefing-hero-image">
+                <img src="/static/levels/level1/supermarket.jpg" alt="Supermarket manager office illustration">
+            </div>
+        </div>
     `;
 }
 

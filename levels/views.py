@@ -108,7 +108,7 @@ def submit_decision_api(request, level_order):
                 'next_action': 'restart',
                 'next_url': f'/levels/{level.order}/',
                 'next_level_order': None,
-                'action_label': 'Retry Level',
+                'action_label': 'Restart This Level',
             }
         )
 
@@ -136,7 +136,7 @@ def submit_decision_api(request, level_order):
             if next_level:
                 next_level_order = next_level.order
                 next_url = f'/story/level/{next_level.order}/'
-                action_label = 'Next Level'
+                action_label = 'Go to Next Level'
             else:
                 next_action = 'certificate'
                 next_url = '/certificate/'
@@ -147,7 +147,7 @@ def submit_decision_api(request, level_order):
     else:
         if next_action == 'restart':
             next_url = f'/levels/{level.order}/'
-            action_label = 'Retry Level'
+            action_label = 'Restart This Level'
 
     return JsonResponse(
         {

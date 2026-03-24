@@ -14,6 +14,46 @@ MIN_SUCCESS_SCORE = 10
 ATTEMPT_PENALTY = 15
 
 
+LEVEL_KNOWLEDGE_POINTS = {
+    2: [
+        'Standardizing data formats and measurement units',
+        'Separating signal from noise in business data',
+        'Tracing data back to its real meaning',
+        'Judging the business logic behind the numbers',
+    ],
+    3: [
+        'Recognizing survivorship bias instead of trusting partial feedback',
+        'Standardizing data formats and measurement units',
+        'Separating signal from noise in business data',
+        'Comparing surface profit indicators with real profit outcome',
+    ],
+    4: [
+        'Recognizing visual misdirection from a mismatched chart baseline',
+        'Comparing charts with raw source data for accuracy',
+        'Recognizing survivorship bias instead of trusting partial summaries',
+        'Standardizing data formats and measurement units',
+    ],
+    5: [
+        "Recognizing Simpson's paradox and separating overall conclusions from subgroup conclusions",
+        'Matching data analysis to the real business scenario',
+        'Recognizing visual misdirection from mismatched presentation choices',
+        'Recognizing survivorship bias instead of trusting partial signals',
+    ],
+    6: [
+        'Judging whether a data sample is representative and avoiding bias from partial samples',
+        'Balancing cost and benefit when making operating decisions',
+        "Recognizing Simpson's paradox and separating overall conclusions from subgroup conclusions",
+        'Recognizing visual misdirection from mismatched chart baselines',
+    ],
+    7: [
+        'Cleaning duplicate records to keep business data accurate',
+        'Standardizing cross-platform data formats and measurement units',
+        'Combining cost and revenue to calculate the real operating result',
+        'Judging whether a sample is representative instead of trusting biased signals',
+    ],
+}
+
+
 def calculate_attempt_score(base_score, attempt_count):
     if base_score <= 0:
         return 0
@@ -89,6 +129,11 @@ def submit_decision_api(request, level_order):
     body = json.loads(request.body or '{}')
     selected_value = body.get('selected_value')
     level_one_path = body.get('level_one_path')
+    level_two_path = body.get('level_two_path')
+    level_three_path = body.get('level_three_path')
+    level_four_path = body.get('level_four_path')
+    level_five_path = body.get('level_five_path')
+    level_six_path = body.get('level_six_path')
     attempt_count = body.get('attempt_count') or 1
     try:
         safe_attempt_count = max(int(attempt_count), 1)
@@ -99,7 +144,7 @@ def submit_decision_api(request, level_order):
         return JsonResponse(
             {
                 'success': False,
-                'message': 'The rushed order failed. You acted on the manager\'s instinct before checking the evidence, so the decision was based on noise instead of cause.',
+                'message': "The rushed order failed. You acted on the manager's instinct before checking the evidence, so the decision was based on noise instead of cause.",
                 'score': 0,
                 'awarded_score': 0,
                 'attempt_count': safe_attempt_count,
@@ -109,6 +154,96 @@ def submit_decision_api(request, level_order):
                 'next_url': f'/levels/{level.order}/',
                 'next_level_order': None,
                 'action_label': 'Restart This Level',
+            }
+        )
+
+    if level.order == 2 and level_two_path == 'accept_manager':
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'Order failed. You placed the order before checking the inventory and sales data or standardizing the units, so the store made an unnecessary egg purchase.',
+                'score': 0,
+                'awarded_score': 0,
+                'attempt_count': safe_attempt_count,
+                'max_score': MAX_LEVEL_SCORE,
+                'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
+                'next_action': 'restart',
+                'next_url': f'/levels/{level.order}/',
+                'next_level_order': None,
+                'action_label': 'Restart This Level',
+                'knowledge_points': LEVEL_KNOWLEDGE_POINTS.get(2, []),
+            }
+        )
+
+    if level.order == 3 and level_three_path == 'accept_manager':
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'Decision failed. You chose to continue the promotion before checking the full campaign data, so you were misled by positive reviews and headline sales growth while the category was actually losing money.',
+                'score': 0,
+                'awarded_score': 0,
+                'attempt_count': safe_attempt_count,
+                'max_score': MAX_LEVEL_SCORE,
+                'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
+                'next_action': 'restart',
+                'next_url': f'/levels/{level.order}/',
+                'next_level_order': None,
+                'action_label': 'Restart This Level',
+                'knowledge_points': LEVEL_KNOWLEDGE_POINTS.get(3, []),
+            }
+        )
+
+    if level.order == 4 and level_four_path == 'accept_manager':
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'Decision failed. You doubled the marketing budget before checking the raw revenue data and the misleading chart baseline, so you reacted to a visual illusion instead of the real growth rate.',
+                'score': 0,
+                'awarded_score': 0,
+                'attempt_count': safe_attempt_count,
+                'max_score': MAX_LEVEL_SCORE,
+                'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
+                'next_action': 'restart',
+                'next_url': f'/levels/{level.order}/',
+                'next_level_order': None,
+                'action_label': 'Restart This Level',
+                'knowledge_points': LEVEL_KNOWLEDGE_POINTS.get(4, []),
+            }
+        )
+
+    if level.order == 5 and level_five_path == 'accept_manager':
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'Decision failed. You chose Supplier A before checking the detailed category margins and the store category mix, so you were misled by the higher overall profit figure.',
+                'score': 0,
+                'awarded_score': 0,
+                'attempt_count': safe_attempt_count,
+                'max_score': MAX_LEVEL_SCORE,
+                'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
+                'next_action': 'restart',
+                'next_url': f'/levels/{level.order}/',
+                'next_level_order': None,
+                'action_label': 'Restart This Level',
+                'knowledge_points': LEVEL_KNOWLEDGE_POINTS.get(5, []),
+            }
+        )
+
+    if level.order == 6 and level_six_path == 'accept_manager':
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'Decision failed. You extended operating hours before checking whether the complaint sample represented real customer flow, so you reacted to a biased signal instead of the full store data.',
+                'score': 0,
+                'awarded_score': 0,
+                'attempt_count': safe_attempt_count,
+                'max_score': MAX_LEVEL_SCORE,
+                'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
+                'next_action': 'restart',
+                'next_url': f'/levels/{level.order}/',
+                'next_level_order': None,
+                'action_label': 'Restart This Level',
+                'knowledge_points': LEVEL_KNOWLEDGE_POINTS.get(6, []),
             }
         )
 
@@ -149,18 +284,21 @@ def submit_decision_api(request, level_order):
             next_url = f'/levels/{level.order}/'
             action_label = 'Restart This Level'
 
-    return JsonResponse(
-        {
-            'success': matched_rule.is_success,
-            'message': matched_rule.message,
-            'score': matched_rule.score,
-            'awarded_score': awarded_score,
-            'attempt_count': safe_attempt_count,
-            'max_score': matched_rule.score or MAX_LEVEL_SCORE,
-            'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
-            'next_action': next_action,
-            'next_url': next_url,
-            'next_level_order': next_level_order,
-            'action_label': action_label,
-        }
-    )
+    response_data = {
+        'success': matched_rule.is_success,
+        'message': matched_rule.message,
+        'score': matched_rule.score,
+        'awarded_score': awarded_score,
+        'attempt_count': safe_attempt_count,
+        'max_score': matched_rule.score or MAX_LEVEL_SCORE,
+        'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
+        'next_action': next_action,
+        'next_url': next_url,
+        'next_level_order': next_level_order,
+        'action_label': action_label,
+    }
+
+    if level.order in LEVEL_KNOWLEDGE_POINTS:
+        response_data['knowledge_points'] = LEVEL_KNOWLEDGE_POINTS[level.order]
+
+    return JsonResponse(response_data)

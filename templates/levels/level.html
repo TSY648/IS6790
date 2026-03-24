@@ -83,6 +83,12 @@
         text-align: left;
     }
 
+    .item-btn:disabled,
+    .decision-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
     .item-btn.active {
         background: #dbeafe;
         border: 1px solid #60a5fa;
@@ -255,7 +261,7 @@
         <h2 id="level-title">{{ level.title }}</h2>
         <p id="level-desc">{{ level.description }}</p>
         <hr>
-        <h3>Mission Objective</h3>
+        <h3 id="objective-heading">Mission Objective</h3>
         <p>{{ level.objective_text|default:level.description }}</p>
     </aside>
 
@@ -270,32 +276,33 @@
     </main>
 
     <aside class="panel right-panel">
-        <h3>Information Sources</h3>
+        <h3 id="info-sources-title">Information Sources</h3>
 
         <div id="category-npc" class="category-block">
-            <div class="category-title">Colleagues</div>
+            <div id="category-npc-title" class="category-title">Colleagues</div>
             <div id="group-npc"></div>
         </div>
 
         <div id="category-report" class="category-block">
-            <div class="category-title">Reports</div>
+            <div id="category-report-title" class="category-title">Reports</div>
             <div id="group-report"></div>
         </div>
 
         <div id="category-external" class="category-block">
-            <div class="category-title">External Info</div>
+            <div id="category-external-title" class="category-title">External Info</div>
             <div id="group-external"></div>
         </div>
 
-        <button id="decision-btn" class="decision-btn" type="button">Go to make decision</button>
+        <button id="decision-btn" class="decision-btn" type="button">Submit Decision</button>
     </aside>
 </div>
 
 <div id="result-modal" class="result-modal hidden">
     <div class="result-content">
-        <h3>Result</h3>
+        <h3 id="result-title">Result</h3>
         <p id="result-message"></p>
         <p id="result-score" style="margin:12px 0 0; color:#4b5563;"></p>
+        <div id="result-knowledge" style="margin-top:16px; color:#374151;"></div>
         <button id="result-action-btn" type="button">OK</button>
     </div>
 </div>
@@ -329,6 +336,15 @@ let levelConfig = null;
 let activeItemCode = null;
 let tutorialStepIndex = 0;
 let levelOnePath = null;
+let levelTwoPath = null;
+let levelThreePath = null;
+let levelFourPath = null;
+let levelFivePath = null;
+let levelSixPath = null;
+let levelSevenProcessingComplete = false;
+let levelSevenRows = [];
+let stagedInvestigationUnlocked = false;
+const viewedKeyItems = new Set();
 
 const canvasArea = document.getElementById('canvas-area');
 const decisionBtn = document.getElementById('decision-btn');
@@ -336,6 +352,7 @@ const resultModal = document.getElementById('result-modal');
 const resultMessage = document.getElementById('result-message');
 const resultScore = document.getElementById('result-score');
 const resultActionBtn = document.getElementById('result-action-btn');
+const resultKnowledge = document.getElementById('result-knowledge');
 const tutorialOverlay = document.getElementById('tutorial-overlay');
 const tutorialTitle = document.getElementById('tutorial-title');
 const tutorialText = document.getElementById('tutorial-text');
@@ -345,6 +362,12 @@ const entryTitle = document.getElementById('entry-title');
 const entryText = document.getElementById('entry-text');
 const acceptSuggestionBtn = document.getElementById('accept-suggestion-btn');
 const investigateFirstBtn = document.getElementById('investigate-first-btn');
+const objectiveHeading = document.getElementById('objective-heading');
+const infoSourcesTitle = document.getElementById('info-sources-title');
+const categoryNpcTitle = document.getElementById('category-npc-title');
+const categoryReportTitle = document.getElementById('category-report-title');
+const categoryExternalTitle = document.getElementById('category-external-title');
+const resultTitle = document.getElementById('result-title');
 
 const tutorialSteps = [
     {
@@ -365,6 +388,11 @@ const tutorialSteps = [
 ];
 
 function renderBriefing() {
+    if (levelOrder === 7) {
+        renderLevelSevenProcessingDesk();
+        return;
+    }
+
     canvasArea.innerHTML = `
         <div class="briefing-hero">
             <div class="briefing-hero-image">
@@ -372,6 +400,15 @@ function renderBriefing() {
             </div>
         </div>
     `;
+}
+
+function markItemViewed(item) {
+    if (![2, 3, 4, 5, 6, 7].includes(levelOrder) || !item.is_key_item) {
+        return;
+    }
+
+    viewedKeyItems.add(item.item_code);
+    syncStagedDecisionState();
 }
 
 function renderItemContent(item) {
@@ -447,7 +484,7 @@ function renderDecisionPanel() {
 
     html += `
         </div>
-        <button id="confirm-submit-btn" class="primary-action" type="button">Confirm Submission</button>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
     `;
 
     canvasArea.innerHTML = html;
@@ -494,17 +531,6 @@ function restartTutorial() {
     startTutorial();
 }
 
-function showLevelOneEntryPrompt() {
-    if (levelOrder !== 1) {
-        return;
-    }
-
-    const managerItem = levelConfig.items.find((item) => item.item_code === 'npc_manager');
-    entryTitle.textContent = managerItem ? managerItem.title : 'Store Manager';
-    entryText.textContent = managerItem ? managerItem.content_text : 'Yesterday demand exploded. We should double the order quantity right now and move fast.';
-    entryOverlay.classList.remove('hidden');
-}
-
 function openDecisionPanel() {
     activeItemCode = null;
     document.querySelectorAll('.item-btn').forEach((button) => {
@@ -534,6 +560,44 @@ function buildResultScoreText(data) {
     return `No points awarded yet. ${data.score_rule}`;
 }
 
+function buildKnowledgePointsHtml(points) {
+    if (!points || !points.length) {
+        return '';
+    }
+
+    const items = points.map((point) => `<li>${point}</li>`).join('');
+    return `
+        <div>
+            <strong>Key Knowledge / Skills Used</strong>
+            <ul style="margin:8px 0 0 18px; padding:0;">${items}</ul>
+        </div>
+    `;
+}
+
+function applyLevelSpecificUiCopy() {
+    if ([3, 4, 5, 6, 7].includes(levelOrder)) {
+        objectiveHeading.textContent = 'Level Objective';
+        infoSourcesTitle.textContent = 'Data / Information Items';
+        categoryNpcTitle.textContent = 'Supermarket Staff';
+        categoryReportTitle.textContent = 'Reports';
+        categoryExternalTitle.textContent = 'External Information';
+        resultTitle.textContent = 'Decision Result';
+        return;
+    }
+
+    if (levelOrder === 2) {
+        resultTitle.textContent = 'Decision Result';
+        return;
+    }
+
+    objectiveHeading.textContent = 'Mission Objective';
+    infoSourcesTitle.textContent = 'Information Sources';
+    categoryNpcTitle.textContent = 'Colleagues';
+    categoryReportTitle.textContent = 'Reports';
+    categoryExternalTitle.textContent = 'External Info';
+    resultTitle.textContent = 'Result';
+}
+
 async function submitDecision() {
     const selected = document.querySelector('input[name="decision_value"]:checked');
     if (!selected) {
@@ -555,7 +619,12 @@ async function submitDecision() {
             body: JSON.stringify({
                 selected_value: selectedValue,
                 attempt_count: attemptCount,
-                level_one_path: levelOnePath
+                level_one_path: levelOnePath,
+                level_two_path: levelTwoPath,
+                level_three_path: levelThreePath,
+                level_four_path: levelFourPath,
+                level_five_path: levelFivePath,
+                level_six_path: levelSixPath
             })
         });
 
@@ -567,6 +636,7 @@ async function submitDecision() {
         saveLevelAttempts(attemptCount);
         resultMessage.textContent = data.message;
         resultScore.textContent = buildResultScoreText(data);
+        resultKnowledge.innerHTML = buildKnowledgePointsHtml(data.knowledge_points || []);
         resultModal.classList.remove('hidden');
 
         if (data.success) {
@@ -622,6 +692,9 @@ function createItemButton(item) {
     btn.className = 'item-btn';
     btn.textContent = item.title;
     btn.type = 'button';
+    if ([2, 3, 4, 5, 6].includes(levelOrder) && !stagedInvestigationUnlocked) {
+        btn.disabled = true;
+    }
     btn.addEventListener('click', () => {
         const wasActive = activeItemCode === item.item_code;
         document.querySelectorAll('.item-btn').forEach((button) => {
@@ -637,10 +710,298 @@ function createItemButton(item) {
         activeItemCode = item.item_code;
         btn.classList.add('active');
         renderItemContent(item);
+        markItemViewed(item);
     });
     return btn;
 }
 
+function updateEntryCopy() {
+    acceptSuggestionBtn.style.display = '';
+    investigateFirstBtn.style.gridColumn = '';
+
+    if (levelOrder === 2) {
+        entryTitle.textContent = 'Store Manager';
+        entryText.textContent = 'The system shows egg inventory at only 100. I recommend ordering 50 cartons right now. Do you want to order immediately or inspect the sales and inventory data first?';
+        acceptSuggestionBtn.textContent = 'Accept Suggestion and Order';
+        investigateFirstBtn.textContent = 'I Want to Check Inventory and Sales First';
+        return;
+    }
+
+    if (levelOrder === 3) {
+        entryTitle.textContent = 'Store Manager';
+        entryText.textContent = 'The promotion drew strong reviews and sales growth over the weekend. I suggest we continue the same buy-one-get-one campaign immediately. Do you want to continue now or inspect the full promotion data first?';
+        acceptSuggestionBtn.textContent = 'Accept Suggestion and Continue Promotion';
+        investigateFirstBtn.textContent = 'I Want to Review the Full Promotion Data';
+        return;
+    }
+
+    if (levelOrder === 4) {
+        entryTitle.textContent = 'Store Manager';
+        entryText.textContent = "This month's revenue chart looks like a huge jump. I recommend doubling next month's marketing budget immediately. Do you want to expand the budget now or inspect the raw revenue data and chart first?";
+        acceptSuggestionBtn.textContent = 'Accept Suggestion and Double Budget';
+        investigateFirstBtn.textContent = 'I Want to Check the Raw Revenue Data First';
+        return;
+    }
+
+    if (levelOrder === 5) {
+        entryTitle.textContent = 'Store Manager';
+        entryText.textContent = 'Supplier A shows a higher overall margin than Supplier B. I recommend choosing Supplier A immediately. Do you want to choose now or verify the detailed category data for both suppliers first?';
+        acceptSuggestionBtn.textContent = 'Accept Suggestion and Choose Supplier A';
+        investigateFirstBtn.textContent = 'I Want to Verify Both Suppliers in Detail';
+        return;
+    }
+
+    if (levelOrder === 6) {
+        entryTitle.textContent = 'Store Manager';
+        entryText.textContent = 'We have received several late-night complaints saying the store closes too early. I recommend extending business hours from 10 PM to midnight immediately. Do you want to extend now or inspect the full customer-flow data first?';
+        acceptSuggestionBtn.textContent = 'Accept Suggestion and Extend Hours';
+        investigateFirstBtn.textContent = 'I Want to Review Full Customer-Flow Data';
+        return;
+    }
+
+    if (levelOrder === 7) {
+        entryTitle.textContent = 'Store Manager';
+        entryText.textContent = 'The takeout records from Meituan and Ele.me are messy, and finance cannot reconcile the real result. Please clean the order data, remove duplicates, unify the units, and tell me whether the channel is profitable or loss-making.';
+        acceptSuggestionBtn.style.display = 'none';
+        investigateFirstBtn.style.gridColumn = '1 / -1';
+        investigateFirstBtn.textContent = 'Start Reconciliation Work';
+        return;
+    }
+
+    const managerItem = levelConfig.items.find((item) => item.item_code === 'npc_manager');
+    entryTitle.textContent = managerItem ? managerItem.title : 'Store Manager';
+    entryText.textContent = managerItem ? managerItem.content_text : 'Yesterday demand exploded. We should double the order quantity right now and move fast.';
+    acceptSuggestionBtn.textContent = 'Accept Suggestion and Order Now';
+    investigateFirstBtn.textContent = 'I Want to Look Into the Cause First';
+}
+
+function showEntryPrompt() {
+    if (![1, 2, 3, 4, 5, 6, 7].includes(levelOrder)) {
+        return;
+    }
+
+    updateEntryCopy();
+    entryOverlay.classList.remove('hidden');
+}
+
+function unlockStagedDataPanel() {
+    stagedInvestigationUnlocked = true;
+    document.querySelectorAll('.item-btn').forEach((button) => {
+        button.disabled = false;
+    });
+    renderBriefing();
+    syncStagedDecisionState();
+}
+
+function syncStagedDecisionState() {
+    if (![2, 3, 4, 5, 6, 7].includes(levelOrder)) {
+        return;
+    }
+
+    const totalKeyItems = levelConfig.items.filter((item) => item.is_key_item).length;
+    const processingReady = levelOrder === 7 ? levelSevenProcessingComplete : true;
+    const ready = stagedInvestigationUnlocked && processingReady && viewedKeyItems.size >= totalKeyItems;
+    decisionBtn.disabled = !ready;
+    if (ready) {
+        decisionBtn.textContent = 'Submit Decision';
+    } else if (levelOrder === 7 && !levelSevenProcessingComplete) {
+        decisionBtn.textContent = 'Complete Data Processing First';
+    } else {
+        decisionBtn.textContent = 'Review All Core Data First';
+    }
+}
+
+function getLevelSevenRawItem() {
+    return levelConfig.items.find((item) => item.item_code === 'takeout_raw');
+}
+
+function initializeLevelSevenRows() {
+    const rawItem = getLevelSevenRawItem();
+    if (!rawItem || !rawItem.content_json || !rawItem.content_json.rows) {
+        levelSevenRows = [];
+        return;
+    }
+
+    levelSevenRows = rawItem.content_json.rows.map((row, index) => ({
+        rowKey: index,
+        platform: row[0],
+        orderId: row[1],
+        item: row[2],
+        quantity: row[3],
+        unit: row[4],
+        revenue: row[5],
+        isDeleted: false,
+        isDuplicate: index === rawItem.content_json.rows.length - 1,
+    }));
+}
+
+function isLevelSevenProcessingReady() {
+    if (!levelSevenRows.length) {
+        return false;
+    }
+
+    const duplicateRemoved = levelSevenRows.some((row) => row.isDuplicate && row.isDeleted);
+    const allUnitsNormalized = levelSevenRows.every((row) => row.isDeleted || row.unit === 'Piece');
+    return duplicateRemoved && allUnitsNormalized;
+}
+
+function updateLevelSevenProcessingState() {
+    levelSevenProcessingComplete = isLevelSevenProcessingReady();
+    syncStagedDecisionState();
+}
+
+function renderLevelSevenProcessingDesk() {
+    if (!levelSevenRows.length) {
+        initializeLevelSevenRows();
+    }
+
+    const visibleRows = levelSevenRows.filter((row) => !row.isDeleted);
+    const rowsHtml = visibleRows.map((row) => `
+        <tr>
+            <td>${row.platform}</td>
+            <td>${row.orderId}</td>
+            <td>${row.item}</td>
+            <td>${row.quantity}</td>
+            <td>
+                <select data-row-key="${row.rowKey}" class="level-seven-unit-select">
+                    <option value="Piece" ${row.unit === 'Piece' ? 'selected' : ''}>Piece</option>
+                    <option value="Portion" ${row.unit === 'Portion' ? 'selected' : ''}>Portion</option>
+                    <option value="Dozen" ${row.unit === 'Dozen' ? 'selected' : ''}>Dozen</option>
+                </select>
+            </td>
+            <td>${row.revenue}</td>
+            <td><button type="button" class="primary-action level-seven-delete-btn" data-row-key="${row.rowKey}" style="margin-top:0; padding:8px 12px;">Delete Row</button></td>
+        </tr>
+    `).join('');
+
+    const statusText = levelSevenProcessingComplete
+        ? 'Processing complete: duplicate removed and all units normalized to pieces.'
+        : 'Processing required: remove the duplicate row and convert every remaining unit into pieces.';
+
+    const summaryText = levelSevenProcessingComplete
+        ? 'Core processing result: after cleanup, takeout revenue is $800 and the monthly channel result is a $1,200 loss.'
+        : 'Complete the cleanup steps first to unlock the reconciliation decision.';
+
+    canvasArea.innerHTML = `
+        <h3>Takeout Data Processing Desk</h3>
+        <p>Use the center workspace to clean the raw takeout data before you make the final reconciliation decision.</p>
+        <p><strong>${statusText}</strong></p>
+        <table border="1" cellpadding="8" cellspacing="0">
+            <tr>
+                <th>Platform</th>
+                <th>Order ID</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Revenue</th>
+                <th>Action</th>
+            </tr>
+            ${rowsHtml}
+        </table>
+        <p style="margin-top:16px;">${summaryText}</p>
+    `;
+
+    document.querySelectorAll('.level-seven-delete-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            const row = levelSevenRows.find((entry) => String(entry.rowKey) === button.dataset.rowKey && !entry.isDeleted);
+            if (row) {
+                row.isDeleted = true;
+                updateLevelSevenProcessingState();
+                renderLevelSevenProcessingDesk();
+            }
+        });
+    });
+
+    document.querySelectorAll('.level-seven-unit-select').forEach((select) => {
+        select.addEventListener('change', () => {
+            const row = levelSevenRows.find((entry) => String(entry.rowKey) === select.dataset.rowKey && !entry.isDeleted);
+            if (row) {
+                row.unit = select.value;
+                updateLevelSevenProcessingState();
+            }
+        });
+    });
+}
+
+function renderLevelTwoRushOrderPanel() {
+    canvasArea.innerHTML = `
+        <h3>Egg Reorder Submission</h3>
+        <p>The manager wants to place an immediate order for 50 cartons before you finish checking the data.</p>
+        <div class="choice-box">
+            <label>
+                <input type="radio" name="decision_value" value="Order" checked>
+                Submit an order for 50 cartons of eggs
+            </label>
+        </div>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
+    `;
+
+    document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
+}
+
+function renderLevelThreeRushPromotionPanel() {
+    canvasArea.innerHTML = `
+        <h3>Promotion Continuation Submission</h3>
+        <p>The manager wants to continue the same fresh-produce promotion before you finish reviewing the full campaign data.</p>
+        <div class="choice-box">
+            <label>
+                <input type="radio" name="decision_value" value="Continue Promotion" checked>
+                Continue the same buy-one-get-one promotion
+            </label>
+        </div>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
+    `;
+
+    document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
+}
+
+function renderLevelFourRushBudgetPanel() {
+    canvasArea.innerHTML = `
+        <h3>Marketing Budget Submission</h3>
+        <p>The manager wants to double next month's marketing budget before you finish checking the raw revenue data.</p>
+        <div class="choice-box">
+            <label>
+                <input type="radio" name="decision_value" value="Double Budget" checked>
+                Double next month's marketing budget
+            </label>
+        </div>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
+    `;
+
+    document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
+}
+
+function renderLevelFiveRushSupplierPanel() {
+    canvasArea.innerHTML = `
+        <h3>Supplier Selection Submission</h3>
+        <p>The manager wants to choose Supplier A before you finish checking the detailed supplier data and the store category structure.</p>
+        <div class="choice-box">
+            <label>
+                <input type="radio" name="decision_value" value="Choose Supplier A" checked>
+                Choose Supplier A immediately
+            </label>
+        </div>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
+    `;
+
+    document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
+}
+
+function renderLevelSixRushHoursPanel() {
+    canvasArea.innerHTML = `
+        <h3>Operating-Hours Submission</h3>
+        <p>The manager wants to extend the supermarket schedule before you finish checking whether the complaint sample represents real demand.</p>
+        <div class="choice-box">
+            <label>
+                <input type="radio" name="decision_value" value="Extend Operating Hours" checked>
+                Extend operating hours from 10 PM to midnight
+            </label>
+        </div>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
+    `;
+
+    document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
+}
 tutorialNextBtn.addEventListener('click', () => {
     tutorialStepIndex += 1;
     renderTutorialStep();
@@ -651,20 +1012,107 @@ window.addEventListener('replay-level-tutorial', () => {
 });
 
 acceptSuggestionBtn.addEventListener('click', () => {
-    levelOnePath = 'accept_manager';
-    entryOverlay.classList.add('hidden');
-    openDecisionPanel();
+    if (levelOrder === 1) {
+        levelOnePath = 'accept_manager';
+        entryOverlay.classList.add('hidden');
+        openDecisionPanel();
+        return;
+    }
+
+    if (levelOrder === 2) {
+        levelTwoPath = 'accept_manager';
+        entryOverlay.classList.add('hidden');
+        renderLevelTwoRushOrderPanel();
+        return;
+    }
+
+    if (levelOrder === 3) {
+        levelThreePath = 'accept_manager';
+        entryOverlay.classList.add('hidden');
+        renderLevelThreeRushPromotionPanel();
+        return;
+    }
+
+    if (levelOrder === 4) {
+        levelFourPath = 'accept_manager';
+        entryOverlay.classList.add('hidden');
+        renderLevelFourRushBudgetPanel();
+        return;
+    }
+
+    if (levelOrder === 5) {
+        levelFivePath = 'accept_manager';
+        entryOverlay.classList.add('hidden');
+        renderLevelFiveRushSupplierPanel();
+        return;
+    }
+
+    if (levelOrder === 6) {
+        levelSixPath = 'accept_manager';
+        entryOverlay.classList.add('hidden');
+        renderLevelSixRushHoursPanel();
+        return;
+    }
 });
 
 investigateFirstBtn.addEventListener('click', () => {
-    levelOnePath = 'investigate_first';
-    entryOverlay.classList.add('hidden');
-    startTutorial();
+    if (levelOrder === 1) {
+        levelOnePath = 'investigate_first';
+        entryOverlay.classList.add('hidden');
+        startTutorial();
+        return;
+    }
+
+    if (levelOrder === 2) {
+        levelTwoPath = 'investigate_first';
+        entryOverlay.classList.add('hidden');
+        unlockStagedDataPanel();
+        return;
+    }
+
+    if (levelOrder === 3) {
+        levelThreePath = 'investigate_first';
+        entryOverlay.classList.add('hidden');
+        unlockStagedDataPanel();
+        return;
+    }
+
+    if (levelOrder === 4) {
+        levelFourPath = 'investigate_first';
+        entryOverlay.classList.add('hidden');
+        unlockStagedDataPanel();
+        return;
+    }
+
+    if (levelOrder === 5) {
+        levelFivePath = 'investigate_first';
+        entryOverlay.classList.add('hidden');
+        unlockStagedDataPanel();
+        return;
+    }
+
+    if (levelOrder === 6) {
+        levelSixPath = 'investigate_first';
+        entryOverlay.classList.add('hidden');
+        unlockStagedDataPanel();
+        return;
+    }
+
+    if (levelOrder === 7) {
+        entryOverlay.classList.add('hidden');
+        stagedInvestigationUnlocked = true;
+        document.querySelectorAll('.item-btn').forEach((button) => {
+            button.disabled = false;
+        });
+        renderLevelSevenProcessingDesk();
+        syncStagedDecisionState();
+    }
 });
 
 async function initLevel() {
     const response = await fetch(`/levels/${levelOrder}/config/`);
     levelConfig = await response.json();
+    applyLevelSpecificUiCopy();
 
     const groups = {
         npc: document.getElementById('group-npc'),
@@ -678,10 +1126,25 @@ async function initLevel() {
         }
     });
 
-    decisionBtn.addEventListener('click', openDecisionPanel);
+    if (levelOrder === 7) {
+        initializeLevelSevenRows();
+    }
 
-    if (levelOrder === 1) {
-        showLevelOneEntryPrompt();
+    decisionBtn.addEventListener('click', () => {
+        if ([2, 3, 4, 5, 6, 7].includes(levelOrder) && decisionBtn.disabled) {
+            return;
+        }
+        openDecisionPanel();
+    });
+
+    if ([2, 3, 4, 5, 6, 7].includes(levelOrder)) {
+        decisionBtn.disabled = true;
+        syncStagedDecisionState();
+    }
+
+    entryOverlay.classList.add('hidden');
+    if ([1, 2, 3, 4, 5, 6, 7].includes(levelOrder)) {
+        showEntryPrompt();
     }
 }
 

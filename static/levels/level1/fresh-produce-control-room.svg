@@ -1,0 +1,84 @@
+<svg width="1280" height="760" viewBox="0 0 1280 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="640" y1="0" x2="640" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/>
+      <stop offset="1" stop-color="#E9F2FA"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="640" y1="86" x2="640" y2="515" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDFEFF"/>
+      <stop offset="1" stop-color="#F1F6FB"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1D4ED8"/>
+      <stop offset="1" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="crate" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#D97706"/>
+      <stop offset="1" stop-color="#B45309"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="760" rx="26" fill="url(#bg)"/>
+  <rect x="44" y="40" width="1192" height="680" rx="28" fill="url(#wall)" stroke="#D5E2EE" stroke-width="2"/>
+
+  <rect x="88" y="88" width="720" height="250" rx="20" fill="#0F172A"/>
+  <rect x="104" y="104" width="688" height="218" rx="14" fill="#F8FBFF"/>
+  <text x="128" y="144" fill="#0F172A" font-family="Arial, sans-serif" font-size="28" font-weight="700">Fresh Produce Loss Dashboard</text>
+  <text x="128" y="182" fill="#64748B" font-family="Arial, sans-serif" font-size="18">Strawberry spoilage is rising while short-term hype is fading.</text>
+
+  <rect x="128" y="214" width="190" height="82" rx="16" fill="#EFF6FF"/>
+  <text x="150" y="246" fill="#2563EB" font-family="Arial, sans-serif" font-size="18" font-weight="700">Spoilage Rate</text>
+  <text x="150" y="284" fill="#0F172A" font-family="Arial, sans-serif" font-size="34" font-weight="700">24.8%</text>
+
+  <rect x="338" y="214" width="190" height="82" rx="16" fill="#ECFDF5"/>
+  <text x="360" y="246" fill="#059669" font-family="Arial, sans-serif" font-size="18" font-weight="700">Last 4 Weeks</text>
+  <text x="360" y="284" fill="#0F172A" font-family="Arial, sans-serif" font-size="34" font-weight="700">Stable</text>
+
+  <rect x="548" y="214" width="216" height="82" rx="16" fill="#FEF2F2"/>
+  <text x="570" y="246" fill="#DC2626" font-family="Arial, sans-serif" font-size="18" font-weight="700">Risk Signal</text>
+  <text x="570" y="284" fill="#0F172A" font-family="Arial, sans-serif" font-size="34" font-weight="700">Over-ordering</text>
+
+  <path d="M132 307C184 284 236 290 288 288C340 286 392 294 444 286C496 278 548 274 600 281C652 288 704 309 756 182" stroke="#2563EB" stroke-width="6" stroke-linecap="round"/>
+  <path d="M132 309C184 300 236 304 288 300C340 296 392 305 444 297C496 289 548 288 600 294C652 300 704 317 756 188" stroke="#10B981" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="132" cy="307" r="8" fill="#fff" stroke="#2563EB" stroke-width="4"/>
+  <circle cx="288" cy="288" r="8" fill="#fff" stroke="#2563EB" stroke-width="4"/>
+  <circle cx="444" cy="286" r="8" fill="#fff" stroke="#2563EB" stroke-width="4"/>
+  <circle cx="600" cy="281" r="8" fill="#fff" stroke="#2563EB" stroke-width="4"/>
+  <circle cx="756" cy="182" r="8" fill="#fff" stroke="#2563EB" stroke-width="4"/>
+
+  <rect x="848" y="88" width="344" height="250" rx="20" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
+  <text x="878" y="132" fill="#9A3412" font-family="Arial, sans-serif" font-size="28" font-weight="700">Manager Note</text>
+  <text x="878" y="178" fill="#7C2D12" font-family="Arial, sans-serif" font-size="22">"Yesterday sold out fast.</text>
+  <text x="878" y="210" fill="#7C2D12" font-family="Arial, sans-serif" font-size="22">Should we double the order?"</text>
+  <rect x="878" y="238" width="262" height="62" rx="14" fill="#FFFFFF"/>
+  <text x="904" y="276" fill="#111827" font-family="Arial, sans-serif" font-size="22" font-weight="700">Check the clues first</text>
+
+  <rect x="90" y="390" width="284" height="256" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <text x="118" y="432" fill="#0F172A" font-family="Arial, sans-serif" font-size="26" font-weight="700">Strawberry Shelf</text>
+  <rect x="126" y="462" width="210" height="128" rx="18" fill="url(#crate)"/>
+  <ellipse cx="162" cy="494" rx="18" ry="16" fill="#EF4444"/>
+  <ellipse cx="205" cy="488" rx="18" ry="16" fill="#F43F5E"/>
+  <ellipse cx="245" cy="499" rx="18" ry="16" fill="#DC2626"/>
+  <ellipse cx="286" cy="490" rx="18" ry="16" fill="#FB7185"/>
+  <ellipse cx="180" cy="538" rx="18" ry="16" fill="#F43F5E"/>
+  <ellipse cx="222" cy="528" rx="18" ry="16" fill="#EF4444"/>
+  <ellipse cx="264" cy="540" rx="18" ry="16" fill="#DC2626"/>
+  <ellipse cx="305" cy="532" rx="18" ry="16" fill="#FB7185"/>
+  <text x="126" y="626" fill="#64748B" font-family="Arial, sans-serif" font-size="18">Too much stock can spoil fast.</text>
+
+  <rect x="398" y="390" width="370" height="256" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <text x="426" y="432" fill="#0F172A" font-family="Arial, sans-serif" font-size="26" font-weight="700">What you need to balance</text>
+  <circle cx="450" cy="486" r="12" fill="#2563EB"/>
+  <text x="478" y="494" fill="#334155" font-family="Arial, sans-serif" font-size="22">Real weekly demand</text>
+  <circle cx="450" cy="536" r="12" fill="#10B981"/>
+  <text x="478" y="544" fill="#334155" font-family="Arial, sans-serif" font-size="22">Shelf life and waste</text>
+  <circle cx="450" cy="586" r="12" fill="#F97316"/>
+  <text x="478" y="594" fill="#334155" font-family="Arial, sans-serif" font-size="22">Short-term social media buzz</text>
+
+  <rect x="792" y="390" width="400" height="256" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <text x="820" y="432" fill="#0F172A" font-family="Arial, sans-serif" font-size="26" font-weight="700">Goal for this level</text>
+  <text x="820" y="484" fill="#334155" font-family="Arial, sans-serif" font-size="23">Order enough strawberries for the week</text>
+  <text x="820" y="520" fill="#334155" font-family="Arial, sans-serif" font-size="23">without letting too many go bad.</text>
+  <rect x="820" y="560" width="330" height="54" rx="16" fill="#DBEAFE"/>
+  <text x="848" y="594" fill="#1D4ED8" font-family="Arial, sans-serif" font-size="22" font-weight="700">Find the signal, ignore the noise</text>
+</svg>

@@ -34,7 +34,7 @@ def upsert_level(apps, level_data):
         level.save()
 
     categories = {
-        'npc': 'NPC',
+        'npc': 'Colleagues',
         'report': 'Reports',
         'external': 'External Info',
     }
@@ -84,8 +84,8 @@ def refresh_levels_one_and_two(apps, schema_editor):
             'level_code': 'level_1',
             'order': 1,
             'title': 'Fresh Produce Waste Crisis',
-            'description': 'Use loss attribution evidence to set a safer strawberry order and cut spoilage before it happens again.',
-            'objective_text': 'Review the right report, compare DOC against shelf life, and choose the strawberry order quantity that protects both availability and profit.',
+            'description': 'Determine the optimal order quantity for strawberries and achieve a turnaround in the profitability of this category.',
+            'objective_text': 'Use the clues you find to decide the right strawberry order for this week, reduce waste, and help the store earn more from this category.',
             'briefing_title': 'Fresh Produce Control Room',
             'briefing_text': 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.',
             'briefing_hint': 'Start with the loss attribution evidence instead of the vanity revenue view. If DOC stays above shelf life, waste will continue.',
@@ -100,14 +100,14 @@ def refresh_levels_one_and_two(apps, schema_editor):
                 {'category': 'external', 'item_code': 'competitor_calendar', 'title': 'Competitor Promotion Calendar', 'content_type': 'text', 'content_text': 'The nearby competitor is ending its fruit coupon on Sunday. Demand may normalize slightly, but there is no evidence of a lasting demand surge large enough to justify a doubled order.', 'sort_order': 8},
             ],
             'decision': {
-                'title': 'Weekly Strawberry Order Decision',
-                'target_text': 'Approve the strawberry order quantity that best fits the trend and keeps expected DOC under shelf life.',
-                'config_json': {'options': [140, 180, 260], 'unit': 'kg'},
+                'title': 'How many kilograms of strawberries should we order for next week?',
+                'target_text': 'Choose the order quantity that feels most reasonable after looking through the clues.',
+                'config_json': {'options': [100, 200, 300], 'unit': 'kg'},
             },
             'rules': [
-                {'rule_name': 'success_180', 'condition_json': {'selected_value': 180}, 'is_success': True, 'message': 'Correct. You opened the loss attribution evidence, ignored the one-day spike, and chose an order that brings DOC back under strawberry shelf life instead of chasing noise.', 'score': 50, 'next_action': 'next_level'},
-                {'rule_name': 'fail_140', 'condition_json': {'selected_value': 140}, 'is_success': False, 'message': 'That correction was too aggressive. You solved the waste risk, but the shelf emptied too early and regular demand was not fully covered.', 'score': 0, 'next_action': 'restart'},
-                {'rule_name': 'fail_260', 'condition_json': {'selected_value': 260}, 'is_success': False, 'message': 'That order still chases yesterday\'s spike. DOC stays too high for a short-life item, so the department ends up with another week of preventable spoilage.', 'score': 0, 'next_action': 'restart'},
+                {'rule_name': 'success_200', 'condition_json': {'selected_value': 200}, 'is_success': True, 'message': 'Nice work! You filtered out the social media hype, focused on the real sales pattern, and chose an order that cuts waste and helps the strawberry category make money again.', 'score': 50, 'next_action': 'next_level'},
+                {'rule_name': 'fail_100', 'condition_json': {'selected_value': 100}, 'is_success': False, 'message': 'Not quite. You ordered too little, so the shelves ran empty too early in the week and the store missed a lot of sales.', 'score': 0, 'next_action': 'restart'},
+                {'rule_name': 'fail_300', 'condition_json': {'selected_value': 300}, 'is_success': False, 'message': 'Not quite. The online buzz faded and rainy weather reduced foot traffic, so too many strawberries were left on the shelf and spoiled. You treated a one-time spike like it would last.', 'score': 0, 'next_action': 'restart'},
             ],
         },
         {

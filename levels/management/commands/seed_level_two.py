@@ -32,7 +32,7 @@ class Command(BaseCommand):
             level2.save()
 
         categories = {
-            'npc': 'NPC',
+            'npc': 'Colleagues',
             'report': 'Reports',
             'external': 'External Info',
         }

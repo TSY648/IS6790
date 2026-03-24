@@ -88,11 +88,29 @@ def submit_decision_api(request, level_order):
     level = get_object_or_404(Level, order=level_order, is_active=True)
     body = json.loads(request.body or '{}')
     selected_value = body.get('selected_value')
+    level_one_path = body.get('level_one_path')
     attempt_count = body.get('attempt_count') or 1
     try:
         safe_attempt_count = max(int(attempt_count), 1)
     except (TypeError, ValueError):
         safe_attempt_count = 1
+
+    if level.order == 1 and level_one_path == 'accept_manager':
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'The rushed order failed. You acted on the manager\'s instinct before checking the evidence, so the decision was based on noise instead of cause.',
+                'score': 0,
+                'awarded_score': 0,
+                'attempt_count': safe_attempt_count,
+                'max_score': MAX_LEVEL_SCORE,
+                'score_rule': '50 points on the first correct attempt, 35 on the second, 20 on the third, and 10 from the fourth attempt onward.',
+                'next_action': 'restart',
+                'next_url': f'/levels/{level.order}/',
+                'next_level_order': None,
+                'action_label': 'Restart This Level',
+            }
+        )
 
     matched_rule = None
     for rule in level.result_rules.all():
@@ -118,7 +136,7 @@ def submit_decision_api(request, level_order):
             if next_level:
                 next_level_order = next_level.order
                 next_url = f'/story/level/{next_level.order}/'
-                action_label = 'Next Level'
+                action_label = 'Go to Next Level'
             else:
                 next_action = 'certificate'
                 next_url = '/certificate/'
@@ -129,7 +147,7 @@ def submit_decision_api(request, level_order):
     else:
         if next_action == 'restart':
             next_url = f'/levels/{level.order}/'
-            action_label = 'Retry Level'
+            action_label = 'Restart This Level'
 
     return JsonResponse(
         {

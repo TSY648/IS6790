@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="435" viewBox="0 0 900 435">
+  <rect width="900" height="435" rx="26" fill="#ffffff"/>
+  <rect x="20" y="12" width="850" height="410" rx="28" fill="#ffffff" stroke="#e7edf5" stroke-width="2"/>
+
+  <text x="48" y="54" fill="#8ea2c2" font-size="18" font-family="Arial, sans-serif" font-weight="700" letter-spacing="6">STRAWBERRY PERFORMANCE - 30 DAY TREND</text>
+
+  <g font-family="Arial, sans-serif" font-size="16" font-weight="700">
+    <circle cx="674" cy="47" r="5" fill="#2f6ecb"/>
+    <text x="686" y="52" fill="#5d7395">REV</text>
+    <circle cx="732" cy="47" r="5" fill="#13a874"/>
+    <text x="744" y="52" fill="#5d7395">PROFIT</text>
+    <circle cx="808" cy="47" r="5" fill="#94a7c4"/>
+    <text x="820" y="52" fill="#5d7395">VOL</text>
+  </g>
+
+  <g stroke="#d7e3f3" stroke-width="2" stroke-dasharray="4 7">
+    <line x1="118" y1="77" x2="836" y2="77"/>
+    <line x1="118" y1="145" x2="836" y2="145"/>
+    <line x1="118" y1="216" x2="836" y2="216"/>
+    <line x1="118" y1="286" x2="836" y2="286"/>
+    <line x1="118" y1="356" x2="836" y2="356"/>
+  </g>
+
+  <g fill="#58779e" font-family="Arial, sans-serif" font-size="20" font-weight="700">
+    <text x="58" y="84">2600</text>
+    <text x="58" y="152">1950</text>
+    <text x="70" y="223">1300</text>
+    <text x="70" y="293">650</text>
+    <text x="98" y="364">0</text>
+  </g>
+
+  <g fill="#58779e" font-family="Arial, sans-serif" font-size="24" font-weight="700">
+    <text x="99" y="394">W-4</text>
+    <text x="278" y="394">W-3</text>
+    <text x="455" y="394">W-2</text>
+    <text x="631" y="394">W-1</text>
+    <text x="724" y="394">YESTERDAY</text>
+  </g>
+
+  <path d="M120 226 C165 228, 205 230, 300 232 C365 233, 420 222, 480 220 C555 219, 610 223, 660 223 C710 223, 750 178, 835 86"
+        fill="none" stroke="#2f6ecb" stroke-width="5" stroke-linecap="round"/>
+  <path d="M120 228 C165 230, 205 232, 300 234 C365 235, 420 224, 480 222 C555 221, 610 225, 660 225 C710 225, 750 180, 835 88"
+        fill="none" stroke="#13a874" stroke-width="5" stroke-linecap="round"/>
+  <path d="M120 230 C165 232, 205 234, 300 236 C365 237, 420 226, 480 224 C555 223, 610 227, 660 227 C710 227, 750 182, 835 90"
+        fill="none" stroke="#94a7c4" stroke-width="5" stroke-linecap="round"/>
+
+  <g>
+    <circle cx="120" cy="228" r="8" fill="#ffffff" stroke="#2f6ecb" stroke-width="4"/>
+    <circle cx="120" cy="228" r="4" fill="#13a874"/>
+    <circle cx="300" cy="234" r="8" fill="#ffffff" stroke="#2f6ecb" stroke-width="4"/>
+    <circle cx="300" cy="234" r="4" fill="#13a874"/>
+    <circle cx="480" cy="222" r="8" fill="#ffffff" stroke="#2f6ecb" stroke-width="4"/>
+    <circle cx="480" cy="222" r="4" fill="#13a874"/>
+    <circle cx="660" cy="225" r="8" fill="#ffffff" stroke="#2f6ecb" stroke-width="4"/>
+    <circle cx="660" cy="225" r="4" fill="#13a874"/>
+    <circle cx="835" cy="88" r="8" fill="#ffffff" stroke="#2f6ecb" stroke-width="4"/>
+    <circle cx="835" cy="88" r="4" fill="#13a874"/>
+  </g>
+</svg>

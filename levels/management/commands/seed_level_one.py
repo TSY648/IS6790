@@ -11,8 +11,8 @@ class Command(BaseCommand):
             level_code='level_1',
             defaults={
                 'title': 'Fresh Produce Waste Crisis',
-                'description': 'Use loss attribution evidence to set a safer strawberry order and cut spoilage before it happens again.',
-                'objective_text': 'Review the right report, compare DOC against shelf life, and choose the strawberry order quantity that protects both availability and profit.',
+                'description': 'Determine the optimal order quantity for strawberries and achieve a turnaround in the profitability of this category.',
+                'objective_text': 'Use the clues you find to decide the right strawberry order for this week, reduce waste, and help the store earn more from this category.',
                 'briefing_title': 'Fresh Produce Control Room',
                 'briefing_text': 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.',
                 'briefing_hint': 'Start with the loss attribution evidence instead of the vanity revenue view. If DOC stays above shelf life, waste will continue.',
@@ -22,8 +22,8 @@ class Command(BaseCommand):
         )
         if not created:
             level1.title = 'Fresh Produce Waste Crisis'
-            level1.description = 'Use loss attribution evidence to set a safer strawberry order and cut spoilage before it happens again.'
-            level1.objective_text = 'Review the right report, compare DOC against shelf life, and choose the strawberry order quantity that protects both availability and profit.'
+            level1.description = 'Determine the optimal order quantity for strawberries and achieve a turnaround in the profitability of this category.'
+            level1.objective_text = 'Use the clues you find to decide the right strawberry order for this week, reduce waste, and help the store earn more from this category.'
             level1.briefing_title = 'Fresh Produce Control Room'
             level1.briefing_text = 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.'
             level1.briefing_hint = 'Start with the loss attribution evidence instead of the vanity revenue view. If DOC stays above shelf life, waste will continue.'
@@ -32,7 +32,7 @@ class Command(BaseCommand):
             level1.save()
 
         categories = {
-            'npc': 'NPC',
+            'npc': 'Colleagues',
             'report': 'Reports',
             'external': 'External Info',
         }
@@ -46,112 +46,94 @@ class Command(BaseCommand):
         items = [
             {
                 'category': resolved_categories['npc'],
-                'item_code': 'npc_manager_push',
+                'item_code': 'npc_manager',
                 'title': 'Store Manager',
                 'content_type': 'text',
                 'content_text': (
-                    'Yesterday we sold out. Demand must be peaking, so why not double the strawberry order and ride '
-                    'the momentum for another week?'
+                    'Yesterday the strawberries sold out and the category looked hot. Should we order more this week '
+                    'and keep the momentum going?'
                 ),
                 'is_key_item': True,
                 'sort_order': 1,
             },
             {
                 'category': resolved_categories['npc'],
-                'item_code': 'npc_analyst_hint',
-                'title': 'Produce Analyst',
+                'item_code': 'npc_zhangjie',
+                'title': 'Ms. Zhang',
                 'content_type': 'text',
                 'content_text': (
-                    'Before we order anything, we should open the Loss Attribution Analysis report. A one-day spike '
-                    'does not explain why spoilage has stayed high.'
+                    'A lot of people came in for strawberries because of the short video yesterday, but that rush is '
+                    'already fading. I do not think the spike will last.'
                 ),
                 'is_key_item': True,
                 'sort_order': 2,
             },
             {
                 'category': resolved_categories['report'],
-                'item_code': 'total_revenue_dashboard',
-                'title': 'Total Revenue Dashboard',
-                'content_type': 'text',
+                'item_code': 'strawberry_order_history',
+                'title': 'Strawberry Order History',
+                'content_type': 'table',
                 'content_text': (
-                    'Yesterday looks exciting because total produce revenue jumped for one day, but this dashboard '
-                    'does not explain which item is spoiling or whether inventory is sitting too long.'
+                    'Strawberry order volumes have stayed fairly steady across the last four weeks, with no sustained '
+                    'increase in replenishment.'
                 ),
+                'content_json': {
+                    'headers': ['Week', 'Product', 'Order Quantity (kg)'],
+                    'rows': [
+                        ['Week 1', 'Strawberry', '197.49'],
+                        ['Week 2', 'Strawberry', '209.01'],
+                        ['Week 3', 'Strawberry', '204.64'],
+                        ['Week 4', 'Strawberry', '201.97'],
+                    ],
+                },
                 'is_key_item': True,
                 'sort_order': 3,
             },
             {
                 'category': resolved_categories['report'],
-                'item_code': 'loss_attribution_report',
-                'title': 'Loss Attribution Analysis Report',
-                'content_type': 'table',
+                'item_code': 'strawberry_sales_trend',
+                'title': 'Strawberry Sales Trend Chart',
+                'content_type': 'image',
                 'content_text': (
-                    'This is the report that explains the waste problem. Strawberries are currently sitting longer '
-                    'than their shelf life allows.'
+                    'Sales were stable over the past four weeks, with a single unusual jump yesterday.'
                 ),
                 'content_json': {
-                    'headers': ['Item', 'Forecast Daily Sales', 'Current Inventory', 'DOC', 'Shelf Life', 'Risk'],
-                    'rows': [
-                        ['Strawberries', '26 kg', '90 kg', '3.5 days', '3 days', 'Waste risk'],
-                        ['Organic Lettuce', '18 kg', '42 kg', '2.3 days', '2 days', 'Waste risk'],
-                    ],
+                    'src': '/static/levels/level1/strawberry-sales-trend.svg',
+                    'alt': 'Strawberry sales trend chart',
                 },
                 'is_key_item': True,
                 'sort_order': 4,
             },
             {
-                'category': resolved_categories['report'],
-                'item_code': 'four_week_sales_trend',
-                'title': '4-Week Strawberry Sales Trend',
-                'content_type': 'chart',
+                'category': resolved_categories['external'],
+                'item_code': 'social_media_clip',
+                'title': 'Social Media Video Clip',
+                'content_type': 'image',
                 'content_text': (
-                    'The four-week pattern is stable, while yesterday is a clear one-day spike. The baseline demand '
-                    'is much closer to the weekly trend than to the outlier.'
+                    'A local influencer posted a strawberry recommendation video yesterday, which drove a temporary '
+                    'wave of extra foot traffic.'
                 ),
                 'content_json': {
-                    'x': ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Yesterday'],
-                    'y': [176, 182, 179, 184, 360],
-                    'x_label': 'Period',
-                    'y_label': 'Strawberry Sales (kg)',
+                    'src': '/static/levels/level1/social-media-clip.png',
+                    'alt': 'Social media video clip',
                 },
                 'is_key_item': True,
                 'sort_order': 5,
             },
             {
                 'category': resolved_categories['external'],
-                'item_code': 'influencer_clip',
-                'title': 'Social Media Video Clip',
-                'content_type': 'text',
+                'item_code': 'weekly_rainfall',
+                'title': 'Weekly Rainfall Forecast',
+                'content_type': 'image',
                 'content_text': (
-                    'A local influencer happened to film outside the store yesterday, and the clip sent a temporary '
-                    'rush of customers looking for strawberries. The traffic spike has already faded.'
+                    'Rain is expected through most of next week, which could reduce store traffic compared with clear days.'
                 ),
+                'content_json': {
+                    'src': '/static/levels/level1/weekly-rainfall.png',
+                    'alt': 'Weekly rainfall forecast',
+                },
                 'is_key_item': True,
                 'sort_order': 6,
-            },
-            {
-                'category': resolved_categories['external'],
-                'item_code': 'weather_forecast',
-                'title': 'Rainfall Forecast for Next Week',
-                'content_type': 'text',
-                'content_text': (
-                    'Rain is expected through most of next week, so total foot traffic should be softer than the '
-                    'influencer day rather than stronger.'
-                ),
-                'is_key_item': True,
-                'sort_order': 7,
-            },
-            {
-                'category': resolved_categories['external'],
-                'item_code': 'competitor_calendar',
-                'title': 'Competitor Promotion Calendar',
-                'content_type': 'text',
-                'content_text': (
-                    'The nearby competitor is ending its fruit coupon on Sunday. Demand may normalize slightly, but '
-                    'there is no evidence of a lasting demand surge large enough to justify a doubled order.'
-                ),
-                'is_key_item': True,
-                'sort_order': 8,
             },
         ]
 
@@ -168,43 +150,40 @@ class Command(BaseCommand):
         DecisionConfig.objects.update_or_create(
             level=level1,
             defaults={
-                'title': 'Weekly Strawberry Order Decision',
-                'target_text': 'Approve the strawberry order quantity that best fits the trend and keeps expected DOC under shelf life.',
+                'title': 'How many kilograms of strawberries should we order for next week?',
+                'target_text': 'Choose the order quantity that feels most reasonable after looking through the clues.',
                 'decision_type': 'single_choice',
-                'config_json': {'options': [140, 180, 260], 'unit': 'kg'},
+                'config_json': {'options': [100, 200, 300], 'unit': 'kg'},
             },
         )
 
         rules = [
             {
-                'rule_name': 'success_180',
-                'condition_json': {'selected_value': 180},
+                'rule_name': 'success_200',
+                'condition_json': {'selected_value': 200},
                 'is_success': True,
                 'message': (
-                    'Correct. You opened the loss attribution evidence, ignored the one-day spike, and chose an order '
-                    'that brings DOC back under strawberry shelf life instead of chasing noise.'
+                    'Nice work! You filtered out the social media hype, focused on the real sales pattern, and chose an order that cuts waste and helps the strawberry category make money again.'
                 ),
                 'score': 50,
                 'next_action': 'next_level',
             },
             {
-                'rule_name': 'fail_140',
-                'condition_json': {'selected_value': 140},
+                'rule_name': 'fail_100',
+                'condition_json': {'selected_value': 100},
                 'is_success': False,
                 'message': (
-                    'That correction was too aggressive. You solved the waste risk, but the shelf emptied too early '
-                    'and regular demand was not fully covered.'
+                    'Not quite. You ordered too little, so the shelves ran empty too early in the week and the store missed a lot of sales.'
                 ),
                 'score': 0,
                 'next_action': 'restart',
             },
             {
-                'rule_name': 'fail_260',
-                'condition_json': {'selected_value': 260},
+                'rule_name': 'fail_300',
+                'condition_json': {'selected_value': 300},
                 'is_success': False,
                 'message': (
-                    'That order still chases yesterday\'s spike. DOC stays too high for a short-life item, so the '
-                    'department ends up with another week of preventable spoilage.'
+                    'Not quite. The online buzz faded and rainy weather reduced foot traffic, so too many strawberries were left on the shelf and spoiled. You treated a one-time spike like it would last.'
                 ),
                 'score': 0,
                 'next_action': 'restart',

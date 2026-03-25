@@ -15,6 +15,12 @@ ATTEMPT_PENALTY = 15
 
 
 LEVEL_KNOWLEDGE_POINTS = {
+    1: [
+        'Separating real business signals from short-term noise',
+        'Tracing clues back to their true source',
+        'Distinguishing temporary hype from stable demand',
+        'Combining external context with sales evidence',
+    ],
     2: [
         'Standardizing data formats and measurement units',
         'Separating signal from noise in business data',
@@ -154,6 +160,7 @@ def submit_decision_api(request, level_order):
                 'next_url': f'/levels/{level.order}/',
                 'next_level_order': None,
                 'action_label': 'Restart This Level',
+                'knowledge_points': LEVEL_KNOWLEDGE_POINTS.get(1, []),
             }
         )
 
@@ -274,10 +281,10 @@ def submit_decision_api(request, level_order):
                 action_label = 'Go to Next Level'
             else:
                 next_action = 'certificate'
-                next_url = '/certificate/'
+                next_url = '/certificate/summary/'
                 action_label = 'View Certificate'
         elif next_action == 'certificate':
-            next_url = '/certificate/'
+            next_url = '/certificate/summary/'
             action_label = 'View Certificate'
     else:
         if next_action == 'restart':

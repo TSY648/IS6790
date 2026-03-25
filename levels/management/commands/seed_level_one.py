@@ -11,8 +11,8 @@ class Command(BaseCommand):
             level_code='level_1',
             defaults={
                 'title': 'Fresh Produce Waste Crisis',
-                'description': 'Determine the optimal order quantity for strawberries and achieve a turnaround in the profitability of this category.',
-                'objective_text': 'Use the clues you find to decide the right strawberry order for this week, reduce waste, and help the store earn more from this category.',
+                'description': 'Identify key decision clues, remove misleading noise, and choose the best strawberry order quantity for next week to turn losses into profit.',
+                'objective_text': 'Tips: Trace the source of the clues to judge whether they are real signals or misleading noise. Distinguish between information that could distort your decision and information that genuinely indicates risk.',
                 'briefing_title': 'Fresh Produce Control Room',
                 'briefing_text': 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.',
                 'briefing_hint': 'Start with the loss attribution evidence instead of the vanity revenue view. If DOC stays above shelf life, waste will continue.',
@@ -22,8 +22,8 @@ class Command(BaseCommand):
         )
         if not created:
             level1.title = 'Fresh Produce Waste Crisis'
-            level1.description = 'Determine the optimal order quantity for strawberries and achieve a turnaround in the profitability of this category.'
-            level1.objective_text = 'Use the clues you find to decide the right strawberry order for this week, reduce waste, and help the store earn more from this category.'
+            level1.description = 'Identify key decision clues, remove misleading noise, and choose the best strawberry order quantity for next week to turn losses into profit.'
+            level1.objective_text = 'Tips: Trace the source of the clues to judge whether they are real signals or misleading noise. Distinguish between information that could distort your decision and information that genuinely indicates risk.'
             level1.briefing_title = 'Fresh Produce Control Room'
             level1.briefing_text = 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.'
             level1.briefing_hint = 'Start with the loss attribution evidence instead of the vanity revenue view. If DOC stays above shelf life, waste will continue.'
@@ -70,39 +70,18 @@ class Command(BaseCommand):
             },
             {
                 'category': resolved_categories['report'],
-                'item_code': 'strawberry_order_history',
-                'title': 'Strawberry Order History',
-                'content_type': 'table',
+                'item_code': 'order_and_sales_history',
+                'title': 'Strawberry Daily Order and Sales History (Past 4 Weeks)',
+                'content_type': 'image',
                 'content_text': (
-                    'Strawberry order volumes have stayed fairly steady across the last four weeks, with no sustained '
-                    'increase in replenishment.'
+                    'Over the past month, daily strawberry orders stayed around 300 kg. Sales remained relatively stable over the last four weeks, averaging about 100 kg per day. Order volume stayed far above sales, which kept the wastage rate high. Yesterday, the last day of the most recent week, showed one unusually strong sales spike.'
                 ),
                 'content_json': {
-                    'headers': ['Week', 'Product', 'Order Quantity (kg)'],
-                    'rows': [
-                        ['Week 1', 'Strawberry', '197.49'],
-                        ['Week 2', 'Strawberry', '209.01'],
-                        ['Week 3', 'Strawberry', '204.64'],
-                        ['Week 4', 'Strawberry', '201.97'],
-                    ],
+                    'src': '/static/levels/level1/strawberry-order-vs-sales-wastage.svg',
+                    'alt': 'Strawberry daily order, sales, and wastage chart',
                 },
                 'is_key_item': True,
                 'sort_order': 3,
-            },
-            {
-                'category': resolved_categories['report'],
-                'item_code': 'strawberry_sales_trend',
-                'title': 'Strawberry Sales Trend Chart',
-                'content_type': 'image',
-                'content_text': (
-                    'Sales were stable over the past four weeks, with a single unusual jump yesterday.'
-                ),
-                'content_json': {
-                    'src': '/static/levels/level1/strawberry-sales-trend.svg',
-                    'alt': 'Strawberry sales trend chart',
-                },
-                'is_key_item': True,
-                'sort_order': 4,
             },
             {
                 'category': resolved_categories['external'],
@@ -114,11 +93,11 @@ class Command(BaseCommand):
                     'wave of extra foot traffic.'
                 ),
                 'content_json': {
-                    'src': '/static/levels/level1/social-media-clip.png',
+                    'src': '/static/levels/level1/social-media-clip-v2.png',
                     'alt': 'Social media video clip',
                 },
                 'is_key_item': True,
-                'sort_order': 5,
+                'sort_order': 4,
             },
             {
                 'category': resolved_categories['external'],
@@ -133,7 +112,7 @@ class Command(BaseCommand):
                     'alt': 'Weekly rainfall forecast',
                 },
                 'is_key_item': True,
-                'sort_order': 6,
+                'sort_order': 5,
             },
         ]
 
@@ -153,27 +132,27 @@ class Command(BaseCommand):
                 'title': 'How many kilograms of strawberries should we order for next week?',
                 'target_text': 'Choose the order quantity that feels most reasonable after looking through the clues.',
                 'decision_type': 'single_choice',
-                'config_json': {'options': [100, 200, 300], 'unit': 'kg'},
+                'config_json': {'options': [50, 100, 300], 'unit': 'kg'},
             },
         )
 
         rules = [
             {
-                'rule_name': 'success_200',
-                'condition_json': {'selected_value': 200},
+                'rule_name': 'success_100',
+                'condition_json': {'selected_value': 100},
                 'is_success': True,
                 'message': (
-                    'Nice work! You filtered out the social media hype, focused on the real sales pattern, and chose an order that cuts waste and helps the strawberry category make money again.'
+                    'Congratulations. You successfully reduced strawberry waste and turned losses into profit. You showed strong data-recognition skills by tracing the source of the evidence, filtering out the short-term noise from the viral post, and identifying the signal of weaker sales in the rainy-week forecast.'
                 ),
                 'score': 50,
                 'next_action': 'next_level',
             },
             {
-                'rule_name': 'fail_100',
-                'condition_json': {'selected_value': 100},
+                'rule_name': 'fail_50',
+                'condition_json': {'selected_value': 50},
                 'is_success': False,
                 'message': (
-                    'Not quite. You ordered too little, so the shelves ran empty too early in the week and the store missed a lot of sales.'
+                    "Too bad. You ordered too little, so the shelves ran empty in the middle of the week and the store lost a large number of customers, which kept you from reaching the profit target. Although you did filter out the noise from the viral post, you were too conservative and overlooked the supermarket's baseline sales. You did not use the historical report to identify the core sales signal correctly."
                 ),
                 'score': 0,
                 'next_action': 'restart',
@@ -183,7 +162,7 @@ class Command(BaseCommand):
                 'condition_json': {'selected_value': 300},
                 'is_success': False,
                 'message': (
-                    'Not quite. The online buzz faded and rainy weather reduced foot traffic, so too many strawberries were left on the shelf and spoiled. You treated a one-time spike like it would last.'
+                    'Too bad. Next week the online buzz will fade, and rainy weather will reduce store traffic, so a large number of strawberries will remain on the shelf and spoil, making the loss even worse. You treated a one-time event as if it were a lasting sales signal.'
                 ),
                 'score': 0,
                 'next_action': 'restart',
@@ -197,3 +176,4 @@ class Command(BaseCommand):
             ResultRule.objects.update_or_create(level=level1, rule_name=rule['rule_name'], defaults=rule)
 
         self.stdout.write(self.style.SUCCESS('Level 1 seed data is ready.'))
+

@@ -58,16 +58,14 @@ class Command(BaseCommand):
             {
                 'category': resolved_categories['report'],
                 'item_code': 'chart_revenue',
-                'title': 'Misleading Revenue Growth Chart',
-                'content_type': 'chart',
+                'title': 'Monthly Revenue Growth Trend',
+                'content_type': 'image',
                 'content_text': (
-                    "The chart starts its Y-axis at 80,000 and displays this month's revenue moving from 82,000 to 83,000, creating the visual impression of a dramatic surge."
+                    "The revenue trend displays this month's revenue moving from 82,000 to 83,000, creating the visual impression of a strong upward rise."
                 ),
                 'content_json': {
-                    'x': ['Last Month', 'This Month'],
-                    'y': [82000, 83000],
-                    'x_label': 'Month',
-                    'y_label': 'Revenue (Y-axis starts at 80,000)',
+                    'src': '/static/levels/level4/monthly-revenue-growth-trend.svg',
+                    'alt': 'Monthly revenue growth trend',
                 },
                 'is_key_item': True,
                 'sort_order': 2,

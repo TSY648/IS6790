@@ -11,8 +11,8 @@ class Command(BaseCommand):
             level_code='level_2',
             defaults={
                 'title': 'Egg Inventory Management Crisis',
-                'description': 'Identify non-standard quantity units in egg sales and inventory data, standardize the records, and decide whether to reorder eggs without creating overstock or a shortage.',
-                'objective_text': 'Unify the egg sales and inventory units, judge the real stock position, and make the correct ordering decision: do not reorder.',
+                'description': 'Identify and standardize the non-standard units used in egg sales and inventory data. Based on the standardized records, judge the real stock position and decide whether to reorder eggs, avoiding both stock buildup and overstock losses while also preventing egg stockouts and controlling unnecessary purchasing cost.',
+                'objective_text': 'Standardize the egg sales and inventory units, judge the real inventory position, and make the correct decision about whether to reorder eggs.',
                 'briefing_title': 'Egg Inventory Review Desk',
                 'briefing_text': 'The system shows an egg inventory value of only 100, and the store manager wants to place an urgent order for 50 cartons of eggs.',
                 'briefing_hint': 'Do not accept the suggestion at face value. Standardize the inventory and sales units first, then judge whether stock is actually low.',
@@ -22,8 +22,8 @@ class Command(BaseCommand):
         )
         if not created:
             level2.title = 'Egg Inventory Management Crisis'
-            level2.description = 'Identify non-standard quantity units in egg sales and inventory data, standardize the records, and decide whether to reorder eggs without creating overstock or a shortage.'
-            level2.objective_text = 'Unify the egg sales and inventory units, judge the real stock position, and make the correct ordering decision: do not reorder.'
+            level2.description = 'Identify and standardize the non-standard units used in egg sales and inventory data. Based on the standardized records, judge the real stock position and decide whether to reorder eggs, avoiding both stock buildup and overstock losses while also preventing egg stockouts and controlling unnecessary purchasing cost.'
+            level2.objective_text = 'Standardize the egg sales and inventory units, judge the real inventory position, and make the correct decision about whether to reorder eggs.'
             level2.briefing_title = 'Egg Inventory Review Desk'
             level2.briefing_text = 'The system shows an egg inventory value of only 100, and the store manager wants to place an urgent order for 50 cartons of eggs.'
             level2.briefing_hint = 'Do not accept the suggestion at face value. Standardize the inventory and sales units first, then judge whether stock is actually low.'
@@ -59,15 +59,18 @@ class Command(BaseCommand):
                 'category': resolved_categories['report'],
                 'item_code': 'egg_sales',
                 'title': 'Egg Historical Sales Data (Last 4 Weeks)',
-                'content_type': 'chart',
+                'content_type': 'table',
                 'content_text': (
-                    'Egg sales stayed stable over the last four weeks at roughly 100 eggs per week, with no major fluctuation.'
+                    'Weekly egg sales remained relatively stable over the last four weeks, averaging around 150 units with no major fluctuation.'
                 ),
                 'content_json': {
-                    'x': ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                    'y': [95, 102, 98, 105],
-                    'x_label': 'Week',
-                    'y_label': 'Eggs Sold',
+                    'headers': ['Week', 'Egg Sales Volume (Units)'],
+                    'rows': [
+                        ['Week 1', '140'],
+                        ['Week 2', '155'],
+                        ['Week 3', '157'],
+                        ['Week 4', '150'],
+                    ],
                 },
                 'is_key_item': True,
                 'sort_order': 2,
@@ -78,12 +81,19 @@ class Command(BaseCommand):
                 'title': 'Current Egg Inventory Data',
                 'content_type': 'table',
                 'content_text': (
-                    'Current egg inventory: 100 cartons. Standardization hint: 1 carton = 10 eggs, but the system only shows the number and does not clearly label the unit.'
+                    'The current inventory table shows mixed product units across the store. Eggs are recorded as 152 units on Monday and rise to 365 units on Sunday, while other products use kg. The system uses non-standard labels, so you must identify what the egg unit really means before deciding whether to reorder.'
                 ),
                 'content_json': {
-                    'headers': ['Item', 'Recorded Stock', 'Displayed Unit', 'Standardized Total'],
+                    'headers': ['Product Name', 'Margin Type', 'Unit', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     'rows': [
-                        ['Egg inventory', '100', 'cartons', '1000 eggs'],
+                        ['Eggs', 'Low Margin', 'Units', '152', '148', '155', '150', '160', '350', '365'],
+                        ['Bananas', 'Low Margin', 'kg', '200', '195', '210', '190', '220', '380', '400'],
+                        ['Cabbage', 'Low Margin', 'kg', '150', '140', '145', '155', '150', '290', '310'],
+                        ['Fuji Apples', 'Normal', 'kg', '150', '155', '140', '145', '160', '165', '175'],
+                        ['Roma Tomatoes', 'Normal', 'kg', '150', '145', '150', '160', '155', '160', '160'],
+                        ['Ribeye Steak', 'High Margin', 'Units', '100', '95', '110', '105', '115', '125', '130'],
+                        ['Strawberries', 'High Margin', 'kg', '148', '142', '140', '145', '140', '150', '300'],
+                        ['DAILY TOTAL', '-', '-', '1050', '1020', '1060', '1050', '1100', '1620', '1840'],
                     ],
                 },
                 'is_key_item': True,

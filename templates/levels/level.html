@@ -432,6 +432,16 @@ function renderItemContent(item) {
             });
             html += '</table>';
         }
+        if (item.content_json.src) {
+            const imageAlt = item.content_json.alt || item.title;
+            html += `
+                <img
+                    src="${item.content_json.src}"
+                    alt="${imageAlt}"
+                    style="max-width:100%; margin-top:16px; border:1px solid #d1d5db; border-radius:12px; background:white;"
+                >
+            `;
+        }
     } else if (item.content_type === 'image') {
         const imageSrc = item.content_json.src || '';
         const imageAlt = item.content_json.alt || item.title;
@@ -565,13 +575,38 @@ function buildKnowledgePointsHtml(points) {
         return '';
     }
 
-    const items = points.map((point) => `<li>${point}</li>`).join('');
+    const items = points.map((point, index) => `
+        <label style="display:flex; gap:8px; align-items:flex-start; margin-top:8px; color:#374151;">
+            <input type="checkbox" class="knowledge-check" value="${index}" style="margin-top:3px;">
+            <span>${point}</span>
+        </label>
+    `).join('');
+
     return `
         <div>
-            <strong>Key Knowledge / Skills Used</strong>
-            <ul style="margin:8px 0 0 18px; padding:0;">${items}</ul>
+            <strong>Knowledge Review Checklist</strong>
+            <p style="margin:8px 0 0; color:#4b5563;">Check all knowledge points used in this level to continue.</p>
+            <div style="margin-top:8px;">${items}</div>
         </div>
     `;
+}
+
+function initializeKnowledgeChecklistGate() {
+    const checks = Array.from(resultKnowledge.querySelectorAll('.knowledge-check'));
+    if (!checks.length) {
+        resultActionBtn.disabled = false;
+        return;
+    }
+
+    const sync = () => {
+        resultActionBtn.disabled = !checks.some((check) => check.checked);
+    };
+
+    checks.forEach((check) => {
+        check.addEventListener('change', sync);
+    });
+
+    sync();
 }
 
 function applyLevelSpecificUiCopy() {
@@ -637,7 +672,6 @@ async function submitDecision() {
         resultMessage.textContent = data.message;
         resultScore.textContent = buildResultScoreText(data);
         resultKnowledge.innerHTML = buildKnowledgePointsHtml(data.knowledge_points || []);
-        resultModal.classList.remove('hidden');
 
         if (data.success) {
             resultActionBtn.textContent = data.action_label || 'Continue';
@@ -666,6 +700,9 @@ async function submitDecision() {
                 }
             };
         }
+
+        initializeKnowledgeChecklistGate();
+        resultModal.classList.remove('hidden');
     } catch (error) {
         alert(error.message || 'Submission failed. Please refresh the page and try again.');
     }

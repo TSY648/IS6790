@@ -1,0 +1,95 @@
+{% extends "core/base.html" %}
+{% block title %}Learning Summary{% endblock %}
+
+{% block extra_css %}
+<style>
+    .summary-page {
+        padding: 40px 24px 72px;
+    }
+    .summary-wrap {
+        width: min(1120px, 100%);
+        margin: 0 auto;
+    }
+    .summary-card {
+        background: #ffffff;
+        border-radius: 28px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
+        padding: 36px;
+    }
+    .summary-card h1 {
+        margin: 0 0 12px;
+        font-size: 40px;
+    }
+    .summary-card p {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.7;
+    }
+    .summary-table-wrap {
+        margin-top: 24px;
+        overflow-x: auto;
+    }
+    .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 760px;
+    }
+    .summary-table th,
+    .summary-table td {
+        border: 1px solid #d1d5db;
+        padding: 12px 14px;
+        text-align: left;
+        vertical-align: top;
+    }
+    .summary-table th {
+        background: #f8fafc;
+        font-weight: 700;
+    }
+    .summary-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="summary-page">
+    <div class="summary-wrap">
+        <div class="summary-card">
+            <h1>Final Knowledge Summary</h1>
+            <p>Before opening the graduation certificate, review the core dimension, key knowledge points, and difficulty level covered in each stage of the supermarket decision-making journey.</p>
+
+            <div class="summary-table-wrap">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Level Number</th>
+                            <th>Core Dimension</th>
+                            <th>Dimension Core Knowledge Points</th>
+                            <th>Difficulty Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in summary_rows %}
+                        <tr>
+                            <td>{{ row.level }}</td>
+                            <td>{{ row.dimension }}</td>
+                            <td>{{ row.knowledge }}</td>
+                            <td>{{ row.difficulty }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary-actions">
+                <a href="/certificate/" class="solid-btn" style="display:inline-flex; align-items:center;">Continue to Certificate</a>
+                <a href="/" class="ghost-btn" style="display:inline-flex; align-items:center; color:#111827; background:rgba(17,24,39,0.08);">Back Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

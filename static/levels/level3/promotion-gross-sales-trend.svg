@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <text x="600" y="34" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#111827">Daily Sales Trend of Fresh Products (Last Week)</text>
+  <line x1="80" y1="660" x2="940" y2="660" stroke="#111827" stroke-width="2"/>
+  <line x1="80" y1="80" x2="80" y2="660" stroke="#111827" stroke-width="2"/>
+  <g stroke="#d1d5db" stroke-dasharray="2 4">
+    <line x1="80" y1="120" x2="940" y2="120"/>
+    <line x1="80" y1="210" x2="940" y2="210"/>
+    <line x1="80" y1="300" x2="940" y2="300"/>
+    <line x1="80" y1="390" x2="940" y2="390"/>
+    <line x1="80" y1="480" x2="940" y2="480"/>
+    <line x1="80" y1="570" x2="940" y2="570"/>
+  </g>
+  <g stroke="#d1d5db" stroke-dasharray="2 4">
+    <line x1="120" y1="80" x2="120" y2="660"/>
+    <line x1="251" y1="80" x2="251" y2="660"/>
+    <line x1="382" y1="80" x2="382" y2="660"/>
+    <line x1="513" y1="80" x2="513" y2="660"/>
+    <line x1="644" y1="80" x2="644" y2="660"/>
+    <line x1="775" y1="80" x2="775" y2="660"/>
+    <line x1="906" y1="80" x2="906" y2="660"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="12" fill="#111827">
+    <text x="36" y="665">100</text><text x="36" y="575">150</text><text x="36" y="485">200</text><text x="36" y="395">250</text><text x="36" y="305">300</text><text x="36" y="215">350</text><text x="36" y="125">400</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="12" fill="#111827">
+    <text x="102" y="682">Mon</text><text x="234" y="682">Tue</text><text x="364" y="682">Wed</text><text x="495" y="682">Thu</text><text x="627" y="682">Fri</text><text x="758" y="682">Sat</text><text x="890" y="682">Sun</text>
+  </g>
+  <text x="24" y="400" transform="rotate(-90 24,400)" font-family="Arial, sans-serif" font-size="14" fill="#111827">Sales Volume (Units/kg)</text>
+  <g fill="none" stroke-width="2.5">
+    <polyline stroke="#1d5fd3" points="120,565 251,579 382,558 513,565 644,570 775,210 906,180"/>
+    <polyline stroke="#e69100" points="120,480 251,489 382,459 513,498 644,440 775,150 906,120"/>
+    <polyline stroke="#0ca678" points="120,570 251,588 382,579 513,565 644,579 775,336 906,294"/>
+    <polyline stroke="#d97706" stroke-dasharray="8 4" points="120,570 251,561 382,588 513,579 644,552 775,534 906,516"/>
+    <polyline stroke="#d17ce0" stroke-dasharray="8 4" points="120,570 251,574 382,565 513,547 644,552 775,547 906,547"/>
+    <polyline stroke="#d09058" stroke-dasharray="8 4" points="120,660 251,669 382,633 513,642 644,620 775,601 906,592"/>
+    <polyline stroke="#f5a6df" stroke-dasharray="8 4" points="120,574 251,588 382,588 513,579 644,588 775,570 906,300"/>
+  </g>
+  <g>
+    <g fill="#1d5fd3"><circle cx="120" cy="565" r="4"/><circle cx="251" cy="579" r="4"/><circle cx="382" cy="558" r="4"/><circle cx="513" cy="565" r="4"/><circle cx="644" cy="570" r="4"/><circle cx="775" cy="210" r="4"/><circle cx="906" cy="180" r="4"/></g>
+    <g fill="#e69100"><circle cx="120" cy="480" r="4"/><circle cx="251" cy="489" r="4"/><circle cx="382" cy="459" r="4"/><circle cx="513" cy="498" r="4"/><circle cx="644" cy="440" r="4"/><circle cx="775" cy="150" r="4"/><circle cx="906" cy="120" r="4"/></g>
+    <g fill="#0ca678"><circle cx="120" cy="570" r="4"/><circle cx="251" cy="588" r="4"/><circle cx="382" cy="579" r="4"/><circle cx="513" cy="565" r="4"/><circle cx="644" cy="579" r="4"/><circle cx="775" cy="336" r="4"/><circle cx="906" cy="294" r="4"/></g>
+    <g fill="#d97706"><circle cx="120" cy="570" r="4"/><circle cx="251" cy="561" r="4"/><circle cx="382" cy="588" r="4"/><circle cx="513" cy="579" r="4"/><circle cx="644" cy="552" r="4"/><circle cx="775" cy="534" r="4"/><circle cx="906" cy="516" r="4"/></g>
+    <g fill="#d17ce0"><circle cx="120" cy="570" r="4"/><circle cx="251" cy="574" r="4"/><circle cx="382" cy="565" r="4"/><circle cx="513" cy="547" r="4"/><circle cx="644" cy="552" r="4"/><circle cx="775" cy="547" r="4"/><circle cx="906" cy="547" r="4"/></g>
+    <g fill="#d09058"><circle cx="120" cy="660" r="4"/><circle cx="251" cy="669" r="4"/><circle cx="382" cy="633" r="4"/><circle cx="513" cy="642" r="4"/><circle cx="644" cy="620" r="4"/><circle cx="775" cy="601" r="4"/><circle cx="906" cy="592" r="4"/></g>
+    <g fill="#f5a6df"><circle cx="120" cy="574" r="4"/><circle cx="251" cy="588" r="4"/><circle cx="382" cy="588" r="4"/><circle cx="513" cy="579" r="4"/><circle cx="644" cy="588" r="4"/><circle cx="775" cy="570" r="4"/><circle cx="906" cy="300" r="4"/></g>
+  </g>
+  <g transform="translate(970 90)" font-family="Arial, sans-serif" font-size="13" fill="#111827">
+    <rect x="0" y="0" width="200" height="180" rx="8" fill="#ffffff" stroke="#d1d5db"/>
+    <line x1="16" y1="24" x2="48" y2="24" stroke="#1d5fd3" stroke-width="2.5"/><circle cx="32" cy="24" r="4" fill="#1d5fd3"/><text x="60" y="29">Eggs (Low Margin)</text>
+    <line x1="16" y1="47" x2="48" y2="47" stroke="#e69100" stroke-width="2.5"/><circle cx="32" cy="47" r="4" fill="#e69100"/><text x="60" y="52">Bananas (Low Margin)</text>
+    <line x1="16" y1="70" x2="48" y2="70" stroke="#0ca678" stroke-width="2.5"/><circle cx="32" cy="70" r="4" fill="#0ca678"/><text x="60" y="75">Cabbage (Low Margin)</text>
+    <line x1="16" y1="93" x2="48" y2="93" stroke="#d97706" stroke-width="2.5" stroke-dasharray="8 4"/><circle cx="32" cy="93" r="4" fill="#d97706"/><text x="60" y="98">Fuji Apples (Normal)</text>
+    <line x1="16" y1="116" x2="48" y2="116" stroke="#d17ce0" stroke-width="2.5" stroke-dasharray="8 4"/><circle cx="32" cy="116" r="4" fill="#d17ce0"/><text x="60" y="121">Roma Tomatoes (Normal)</text>
+    <line x1="16" y1="139" x2="48" y2="139" stroke="#d09058" stroke-width="2.5" stroke-dasharray="8 4"/><circle cx="32" cy="139" r="4" fill="#d09058"/><text x="60" y="144">Ribeye Steak (High Margin)</text>
+    <line x1="16" y1="162" x2="48" y2="162" stroke="#f5a6df" stroke-width="2.5" stroke-dasharray="8 4"/><circle cx="32" cy="162" r="4" fill="#f5a6df"/><text x="60" y="167">Strawberries (High Margin)</text>
+  </g>
+</svg>

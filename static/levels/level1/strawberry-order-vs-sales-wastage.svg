@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <rect width="1200" height="600" fill="#ffffff"/>
+  <text x="600" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#111827">
+    Strawberry Order vs Sales &amp; Wastage Rate (Last 4 Weeks)
+  </text>
+
+  <line x1="90" y1="540" x2="1130" y2="540" stroke="#111827" stroke-width="2"/>
+  <line x1="90" y1="80" x2="90" y2="540" stroke="#111827" stroke-width="2"/>
+  <line x1="1130" y1="80" x2="1130" y2="540" stroke="#9ca3af" stroke-width="2"/>
+
+  <g font-family="Arial, sans-serif" font-size="12" fill="#374151">
+    <text x="54" y="545">0</text>
+    <text x="42" y="480">50</text>
+    <text x="36" y="415">100</text>
+    <text x="36" y="350">150</text>
+    <text x="36" y="285">200</text>
+    <text x="36" y="220">250</text>
+    <text x="36" y="155">300</text>
+    <text x="36" y="90">350</text>
+  </g>
+
+  <g font-family="Arial, sans-serif" font-size="12" fill="#9ca3af">
+    <text x="1140" y="545">0</text>
+    <text x="1140" y="453">20</text>
+    <text x="1140" y="361">40</text>
+    <text x="1140" y="269">60</text>
+    <text x="1140" y="177">80</text>
+    <text x="1136" y="85">100</text>
+  </g>
+
+  <g stroke="#d1d5db" stroke-dasharray="2 4">
+    <line x1="90" y1="474" x2="1130" y2="474"/>
+    <line x1="90" y1="409" x2="1130" y2="409"/>
+    <line x1="90" y1="344" x2="1130" y2="344"/>
+    <line x1="90" y1="279" x2="1130" y2="279"/>
+    <line x1="90" y1="214" x2="1130" y2="214"/>
+    <line x1="90" y1="149" x2="1130" y2="149"/>
+  </g>
+
+  <g fill="#e5e7eb">
+    <rect x="123" y="214" width="28" height="326"/>
+    <rect x="158" y="232" width="28" height="308"/>
+    <rect x="193" y="223" width="28" height="317"/>
+    <rect x="228" y="241" width="28" height="299"/>
+    <rect x="263" y="219" width="28" height="321"/>
+    <rect x="298" y="228" width="28" height="312"/>
+    <rect x="333" y="236" width="28" height="304"/>
+    <rect x="368" y="210" width="28" height="330"/>
+    <rect x="403" y="226" width="28" height="314"/>
+    <rect x="438" y="232" width="28" height="308"/>
+    <rect x="473" y="219" width="28" height="321"/>
+    <rect x="508" y="228" width="28" height="312"/>
+    <rect x="543" y="241" width="28" height="299"/>
+    <rect x="578" y="232" width="28" height="308"/>
+    <rect x="613" y="210" width="28" height="330"/>
+    <rect x="648" y="223" width="28" height="317"/>
+    <rect x="683" y="214" width="28" height="326"/>
+    <rect x="718" y="228" width="28" height="312"/>
+    <rect x="753" y="236" width="28" height="304"/>
+    <rect x="788" y="210" width="28" height="330"/>
+    <rect x="823" y="228" width="28" height="312"/>
+    <rect x="858" y="223" width="28" height="317"/>
+    <rect x="893" y="210" width="28" height="330"/>
+    <rect x="928" y="228" width="28" height="312"/>
+    <rect x="963" y="219" width="28" height="321"/>
+    <rect x="998" y="241" width="28" height="299"/>
+    <rect x="1033" y="214" width="28" height="326"/>
+  </g>
+
+  <line x1="110" y1="149" x2="1090" y2="149" stroke="#60a5fa" stroke-width="3" stroke-dasharray="10 6"/>
+
+  <polyline
+    fill="none"
+    stroke="#e74c3c"
+    stroke-width="2.5"
+    points="137,429 172,410 207,399 242,417 277,421 312,429 347,399 382,408 417,429 452,403 487,410 522,406 557,421 592,421 627,405 662,408 697,434 732,429 767,405 802,436 837,408 872,409 907,438 942,405 977,420 1012,399 1047,430 1082,149"
+  />
+
+  <g fill="#e74c3c">
+    <circle cx="137" cy="429" r="3.5"/>
+    <circle cx="172" cy="410" r="3.5"/>
+    <circle cx="207" cy="399" r="3.5"/>
+    <circle cx="242" cy="417" r="3.5"/>
+    <circle cx="277" cy="421" r="3.5"/>
+    <circle cx="312" cy="429" r="3.5"/>
+    <circle cx="347" cy="399" r="3.5"/>
+    <circle cx="382" cy="408" r="3.5"/>
+    <circle cx="417" cy="429" r="3.5"/>
+    <circle cx="452" cy="403" r="3.5"/>
+    <circle cx="487" cy="410" r="3.5"/>
+    <circle cx="522" cy="406" r="3.5"/>
+    <circle cx="557" cy="421" r="3.5"/>
+    <circle cx="592" cy="421" r="3.5"/>
+    <circle cx="627" cy="405" r="3.5"/>
+    <circle cx="662" cy="408" r="3.5"/>
+    <circle cx="697" cy="434" r="3.5"/>
+    <circle cx="732" cy="429" r="3.5"/>
+    <circle cx="767" cy="405" r="3.5"/>
+    <circle cx="802" cy="436" r="3.5"/>
+    <circle cx="837" cy="408" r="3.5"/>
+    <circle cx="872" cy="409" r="3.5"/>
+    <circle cx="907" cy="438" r="3.5"/>
+    <circle cx="942" cy="405" r="3.5"/>
+    <circle cx="977" cy="420" r="3.5"/>
+    <circle cx="1012" cy="399" r="3.5"/>
+    <circle cx="1047" cy="430" r="3.5"/>
+    <circle cx="1082" cy="149" r="3.5"/>
+  </g>
+
+  <g font-family="Arial, sans-serif" font-size="12" fill="#374151">
+    <text x="131" y="560">1</text>
+    <text x="201" y="560">3</text>
+    <text x="271" y="560">5</text>
+    <text x="341" y="560">7</text>
+    <text x="411" y="560">9</text>
+    <text x="475" y="560">11</text>
+    <text x="545" y="560">13</text>
+    <text x="615" y="560">15</text>
+    <text x="685" y="560">17</text>
+    <text x="755" y="560">19</text>
+    <text x="825" y="560">21</text>
+    <text x="895" y="560">23</text>
+    <text x="965" y="560">25</text>
+    <text x="1035" y="560">27</text>
+  </g>
+
+  <text x="25" y="310" transform="rotate(-90 25,310)" font-family="Arial, sans-serif" font-size="14" fill="#111827">
+    Volume (kg)
+  </text>
+  <text x="1178" y="330" transform="rotate(-90 1178,330)" font-family="Arial, sans-serif" font-size="14" fill="#9ca3af">
+    Wastage Rate (%)
+  </text>
+  <text x="535" y="582" font-family="Arial, sans-serif" font-size="14" fill="#111827">
+    Day (Past 4 Weeks)
+  </text>
+
+  <g font-family="Arial, sans-serif" font-size="12" fill="#111827">
+    <line x1="140" y1="60" x2="175" y2="60" stroke="#60a5fa" stroke-width="3" stroke-dasharray="10 6"/>
+    <text x="183" y="64">Order Volume</text>
+    <line x1="140" y1="84" x2="175" y2="84" stroke="#e74c3c" stroke-width="2.5"/>
+    <circle cx="157" cy="84" r="3.5" fill="#e74c3c"/>
+    <text x="183" y="88">Sales Volume</text>
+    <rect x="140" y="98" width="35" height="12" fill="#e5e7eb"/>
+    <text x="183" y="109">Wastage Rate (%)</text>
+  </g>
+</svg>

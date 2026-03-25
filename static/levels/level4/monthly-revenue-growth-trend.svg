@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600">
+  <rect width="1000" height="600" fill="#ffffff"/>
+  <text x="500" y="36" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#111827">Monthly Revenue Growth Trend</text>
+  <line x1="102" y1="540" x2="965" y2="540" stroke="#111827" stroke-width="2"/>
+  <line x1="102" y1="62" x2="102" y2="540" stroke="#111827" stroke-width="2"/>
+  <g stroke="#c7ced8" stroke-dasharray="4 4">
+    <line x1="102" y1="62" x2="965" y2="62"/>
+    <line x1="102" y1="129" x2="965" y2="129"/>
+    <line x1="102" y1="196" x2="965" y2="196"/>
+    <line x1="102" y1="263" x2="965" y2="263"/>
+    <line x1="102" y1="330" x2="965" y2="330"/>
+    <line x1="102" y1="397" x2="965" y2="397"/>
+    <line x1="102" y1="464" x2="965" y2="464"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="12" fill="#111827">
+    <text x="55" y="545">81,800</text>
+    <text x="55" y="478">82,000</text>
+    <text x="55" y="411">82,200</text>
+    <text x="55" y="344">82,400</text>
+    <text x="55" y="277">82,600</text>
+    <text x="55" y="210">82,800</text>
+    <text x="55" y="143">83,000</text>
+    <text x="55" y="76">83,200</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="14" fill="#111827">
+    <text x="98" y="560">Last Month</text>
+    <text x="869" y="560">Current Month</text>
+  </g>
+  <text x="492" y="585" font-family="Arial, sans-serif" font-size="16" fill="#111827">Period</text>
+  <text x="28" y="330" transform="rotate(-90 28,330)" font-family="Arial, sans-serif" font-size="16" fill="#111827">Revenue</text>
+  <line x1="142" y1="472" x2="923" y2="129" stroke="#2878b5" stroke-width="5"/>
+  <circle cx="142" cy="472" r="8" fill="#2878b5"/>
+  <circle cx="923" cy="129" r="8" fill="#2878b5"/>
+  <text x="110" y="452" font-family="Arial, sans-serif" font-size="18" fill="#111827">82,000</text>
+  <text x="892" y="108" font-family="Arial, sans-serif" font-size="18" fill="#111827">83,000</text>
+</svg>

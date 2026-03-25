@@ -11,8 +11,8 @@ class Command(BaseCommand):
             level_code='level_3',
             defaults={
                 'title': 'Promotion Effect Misjudgment Crisis',
-                'description': 'Identify how positive feedback and gross-sales growth can hide the real profit outcome of a fresh-produce promotion, then decide whether the campaign should continue.',
-                'objective_text': 'Analyze the full promotion dataset, judge the real effect, and choose whether to continue or stop the campaign so fresh produce returns to a healthy gross-profit level.',
+                'description': 'Identify the survivorship bias in fresh-produce promotions, where partial hot-sales feedback hides the overall profit loss, then judge the real promotion effect and decide whether the campaign should continue.',
+                'objective_text': 'Analyze the full promotion dataset, judge the real campaign result, and decide whether the promotion should continue or stop.',
                 'briefing_title': 'Promotion Performance Review Desk',
                 'briefing_text': 'Weekend sales in fresh produce rose sharply during the buy-one-get-one campaign, and the store manager wants to keep the same promotion going.',
                 'briefing_hint': 'Do not confuse strong reviews and sales growth with a healthy campaign result. Check the profit outcome before deciding.',
@@ -22,8 +22,8 @@ class Command(BaseCommand):
         )
         if not created:
             level3.title = 'Promotion Effect Misjudgment Crisis'
-            level3.description = 'Identify how positive feedback and gross-sales growth can hide the real profit outcome of a fresh-produce promotion, then decide whether the campaign should continue.'
-            level3.objective_text = 'Analyze the full promotion dataset, judge the real effect, and choose whether to continue or stop the campaign so fresh produce returns to a healthy gross-profit level.'
+            level3.description = 'Identify the survivorship bias in fresh-produce promotions, where partial hot-sales feedback hides the overall profit loss, then judge the real promotion effect and decide whether the campaign should continue.'
+            level3.objective_text = 'Analyze the full promotion dataset, judge the real campaign result, and decide whether the promotion should continue or stop.'
             level3.briefing_title = 'Promotion Performance Review Desk'
             level3.briefing_text = 'Weekend sales in fresh produce rose sharply during the buy-one-get-one campaign, and the store manager wants to keep the same promotion going.'
             level3.briefing_hint = 'Do not confuse strong reviews and sales growth with a healthy campaign result. Check the profit outcome before deciding.'
@@ -80,6 +80,8 @@ class Command(BaseCommand):
                         ['Fresh Produce Gross Sales', '$10,000', '$14,000', '+40%'],
                         ['Low-Margin Traffic Items Share', '35%', '68%', '+33 pts'],
                     ],
+                    'src': '/static/levels/level3/promotion-gross-sales-trend.svg',
+                    'alt': 'Daily sales trend of fresh products last week',
                 },
                 'is_key_item': True,
                 'sort_order': 3,

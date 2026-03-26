@@ -3,3 +3,14 @@ __pycache__/
 db.sqlite3
 media/
 .venv/
+staticfiles/
+.env
+.env.*
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+Thumbs.db
+.DS_Store

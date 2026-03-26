@@ -12,7 +12,7 @@ class Command(BaseCommand):
             defaults={
                 'title': 'Fresh Produce Waste Crisis',
                 'description': 'Identify key decision clues, remove misleading noise, and choose the best strawberry order quantity for next week to turn losses into profit.',
-                'objective_text': 'Tips: Trace the source of the clues to judge whether they are real signals or misleading noise. Distinguish between information that could distort your decision and information that genuinely indicates risk.',
+                'objective_text': 'Use the clues you find to decide the right strawberry order for this week, reduce waste, and help the store earn more from this category.',
                 'briefing_title': 'Fresh Produce Control Room',
                 'briefing_text': 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.',
                 'briefing_hint': 'Start with the loss attribution evidence instead of the vanity revenue view. If DOC stays above shelf life, waste will continue.',
@@ -23,7 +23,7 @@ class Command(BaseCommand):
         if not created:
             level1.title = 'Fresh Produce Waste Crisis'
             level1.description = 'Identify key decision clues, remove misleading noise, and choose the best strawberry order quantity for next week to turn losses into profit.'
-            level1.objective_text = 'Tips: Trace the source of the clues to judge whether they are real signals or misleading noise. Distinguish between information that could distort your decision and information that genuinely indicates risk.'
+            level1.objective_text = 'Use the clues you find to decide the right strawberry order for this week, reduce waste, and help the store earn more from this category.'
             level1.briefing_title = 'Fresh Produce Control Room'
             level1.briefing_text = 'Strawberry and lettuce spoilage is close to 25%, and the boss wants next week planned before more stock goes bad.'
             level1.briefing_hint = 'Start with the loss attribution evidence instead of the vanity revenue view. If DOC stays above shelf life, waste will continue.'
@@ -132,27 +132,27 @@ class Command(BaseCommand):
                 'title': 'How many kilograms of strawberries should we order for next week?',
                 'target_text': 'Choose the order quantity that feels most reasonable after looking through the clues.',
                 'decision_type': 'single_choice',
-                'config_json': {'options': [50, 100, 300], 'unit': 'kg'},
+                'config_json': {'options': [100, 200, 300], 'unit': 'kg'},
             },
         )
 
         rules = [
             {
-                'rule_name': 'success_100',
-                'condition_json': {'selected_value': 100},
+                'rule_name': 'success_200',
+                'condition_json': {'selected_value': 200},
                 'is_success': True,
                 'message': (
-                    'Congratulations. You successfully reduced strawberry waste and turned losses into profit. You showed strong data-recognition skills by tracing the source of the evidence, filtering out the short-term noise from the viral post, and identifying the signal of weaker sales in the rainy-week forecast.'
+                    'Nice work! You filtered out the social media hype, focused on the real sales pattern, and chose an order that cuts waste and helps the strawberry category make money again.'
                 ),
                 'score': 50,
                 'next_action': 'next_level',
             },
             {
-                'rule_name': 'fail_50',
-                'condition_json': {'selected_value': 50},
+                'rule_name': 'fail_100',
+                'condition_json': {'selected_value': 100},
                 'is_success': False,
                 'message': (
-                    "Too bad. You ordered too little, so the shelves ran empty in the middle of the week and the store lost a large number of customers, which kept you from reaching the profit target. Although you did filter out the noise from the viral post, you were too conservative and overlooked the supermarket's baseline sales. You did not use the historical report to identify the core sales signal correctly."
+                    'Not quite. You ordered too little, so the shelves ran empty too early in the week and the store missed a lot of sales.'
                 ),
                 'score': 0,
                 'next_action': 'restart',
@@ -162,7 +162,7 @@ class Command(BaseCommand):
                 'condition_json': {'selected_value': 300},
                 'is_success': False,
                 'message': (
-                    'Too bad. Next week the online buzz will fade, and rainy weather will reduce store traffic, so a large number of strawberries will remain on the shelf and spoil, making the loss even worse. You treated a one-time event as if it were a lasting sales signal.'
+                    'Not quite. The online buzz faded and rainy weather reduced foot traffic, so too many strawberries were left on the shelf and spoiled. You treated a one-time spike like it would last.'
                 ),
                 'score': 0,
                 'next_action': 'restart',

@@ -73,7 +73,9 @@
     }
 
     .item-btn {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 10px;
         width: 100%;
         margin-top: 8px;
         padding: 10px 12px;
@@ -81,6 +83,19 @@
         border: none;
         border-radius: 8px;
         text-align: left;
+    }
+
+    .item-btn-label {
+        flex: 1;
+    }
+
+    .manager-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        object-fit: cover;
+        flex: 0 0 32px;
+        border: 1px solid #d1d5db;
     }
 
     .item-btn:disabled,
@@ -129,6 +144,14 @@
         max-width: 90%;
         border-radius: 12px;
         padding: 24px;
+        display: flex;
+        flex-direction: column;
+        min-height: 220px;
+    }
+
+    #result-action-btn {
+        align-self: flex-end;
+        margin-top: 20px;
     }
 
     .primary-action {
@@ -206,6 +229,18 @@
     .entry-card h3 {
         margin: 0 0 12px;
         font-size: 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .entry-title-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        object-fit: cover;
+        flex: 0 0 44px;
+        border: 1px solid #d1d5db;
     }
 
     .entry-card p {
@@ -249,6 +284,10 @@
 
         .entry-actions {
             grid-template-columns: 1fr;
+        }
+
+        #result-action-btn {
+            width: 100%;
         }
     }
 </style>
@@ -319,7 +358,10 @@
 
 <div id="entry-overlay" class="entry-overlay hidden">
     <div class="entry-card">
-        <h3 id="entry-title">Store Manager</h3>
+        <h3 id="entry-title">
+            <img class="entry-title-avatar" src="/static/levels/shared/store-manager-avatar.png" alt="Store Manager avatar">
+            <span id="entry-title-text">Store Manager</span>
+        </h3>
         <p id="entry-text">Yesterday demand exploded. We should double the order quantity right now and move fast.</p>
         <div class="entry-actions">
             <button id="accept-suggestion-btn" class="primary-action" type="button">Accept Suggestion and Order Now</button>
@@ -359,6 +401,7 @@ const tutorialText = document.getElementById('tutorial-text');
 const tutorialNextBtn = document.getElementById('tutorial-next-btn');
 const entryOverlay = document.getElementById('entry-overlay');
 const entryTitle = document.getElementById('entry-title');
+const entryTitleText = document.getElementById('entry-title-text');
 const entryText = document.getElementById('entry-text');
 const acceptSuggestionBtn = document.getElementById('accept-suggestion-btn');
 const investigateFirstBtn = document.getElementById('investigate-first-btn');
@@ -413,6 +456,10 @@ function markItemViewed(item) {
 
 function renderItemContent(item) {
     let html = `<h3>${item.title}</h3>`;
+    const isLevelOneSocialClip = levelOrder === 1 && item.item_code === 'social_media_clip';
+    const sharedImageStyle = isLevelOneSocialClip
+        ? 'max-width:60%; max-height:55vh; display:block; margin:16px auto 0; border:1px solid #d1d5db; border-radius:12px; background:white; object-fit:contain;'
+        : 'max-width:100%; border:1px solid #d1d5db; border-radius:12px; background:white;';
 
     if (item.content_type === 'table') {
         html += `<p>${item.content_text}</p>`;
@@ -425,8 +472,11 @@ function renderItemContent(item) {
             html += '</tr>';
             item.content_json.rows.forEach((row) => {
                 html += '<tr>';
-                row.forEach((cell) => {
-                    html += `<td>${cell}</td>`;
+                row.forEach((cell, cellIndex) => {
+                    const displayCell = levelOrder === 7 && item.item_code === 'takeout_raw' && cellIndex === 0
+                        ? getLevelSevenPlatformLabel(cell)
+                        : cell;
+                    html += `<td>${displayCell}</td>`;
                 });
                 html += '</tr>';
             });
@@ -438,7 +488,7 @@ function renderItemContent(item) {
                 <img
                     src="${item.content_json.src}"
                     alt="${imageAlt}"
-                    style="max-width:100%; margin-top:16px; border:1px solid #d1d5db; border-radius:12px; background:white;"
+                    style="${isLevelOneSocialClip ? sharedImageStyle : `margin-top:16px; ${sharedImageStyle}`}"
                 >
             `;
         }
@@ -451,7 +501,7 @@ function renderItemContent(item) {
                 <img
                     src="${imageSrc}"
                     alt="${imageAlt}"
-                    style="max-width:100%; border:1px solid #d1d5db; border-radius:12px; background:white;"
+                    style="${sharedImageStyle}"
                 >
             `;
         }
@@ -612,22 +662,26 @@ function initializeKnowledgeChecklistGate() {
 function applyLevelSpecificUiCopy() {
     if ([3, 4, 5, 6, 7].includes(levelOrder)) {
         objectiveHeading.textContent = 'Level Objective';
-        infoSourcesTitle.textContent = 'Data / Information Items';
+        infoSourcesTitle.textContent = 'Information Sources';
         categoryNpcTitle.textContent = 'Supermarket Staff';
         categoryReportTitle.textContent = 'Reports';
         categoryExternalTitle.textContent = 'External Information';
         resultTitle.textContent = 'Decision Result';
+        if (levelOrder === 7) {
+            document.getElementById('level-desc').textContent = 'Standardize raw takeout order data from Platform A and Platform B, remove duplicate records, unify counting units, and reconcile the real profit or loss of the takeout business.';
+        }
         return;
     }
 
     if (levelOrder === 2) {
+        categoryNpcTitle.textContent = 'Supermarket Staff';
         resultTitle.textContent = 'Decision Result';
         return;
     }
 
     objectiveHeading.textContent = 'Mission Objective';
     infoSourcesTitle.textContent = 'Information Sources';
-    categoryNpcTitle.textContent = 'Colleagues';
+    categoryNpcTitle.textContent = 'Supermarket Staff';
     categoryReportTitle.textContent = 'Reports';
     categoryExternalTitle.textContent = 'External Info';
     resultTitle.textContent = 'Result';
@@ -671,9 +725,9 @@ async function submitDecision() {
         saveLevelAttempts(attemptCount);
         resultMessage.textContent = data.message;
         resultScore.textContent = buildResultScoreText(data);
-        resultKnowledge.innerHTML = buildKnowledgePointsHtml(data.knowledge_points || []);
 
         if (data.success) {
+            resultKnowledge.innerHTML = buildKnowledgePointsHtml(data.knowledge_points || []);
             resultActionBtn.textContent = data.action_label || 'Continue';
             saveLevelScore(data.awarded_score || 0);
             localStorage.setItem(`level_${levelOrder}_passed`, 'true');
@@ -689,6 +743,7 @@ async function submitDecision() {
                 window.location.href = data.next_url || '/certificate/';
             };
         } else {
+            resultKnowledge.innerHTML = '';
             resultActionBtn.textContent = data.action_label || 'Retry Level';
             localStorage.removeItem(`level_${levelOrder}_score`);
             localStorage.setItem('current_level', String(levelOrder));
@@ -727,8 +782,20 @@ function createItemButton(item) {
     const btn = document.createElement('button');
     btn.id = `btn-${item.item_code}`;
     btn.className = 'item-btn';
-    btn.textContent = item.title;
     btn.type = 'button';
+    if (item.title === 'Store Manager') {
+        btn.innerHTML = `
+            <img class="manager-avatar" src="/static/levels/shared/store-manager-avatar.png" alt="Store Manager avatar">
+            <span class="item-btn-label">${item.title}</span>
+        `;
+    } else if (levelOrder === 1 && item.title === 'Ms. Zhang') {
+        btn.innerHTML = `
+            <img class="manager-avatar" src="/static/levels/shared/cashier-avatar.png" alt="Cashier avatar">
+            <span class="item-btn-label">Cashier</span>
+        `;
+    } else {
+        btn.innerHTML = `<span class="item-btn-label">${item.title}</span>`;
+    }
     if ([2, 3, 4, 5, 6].includes(levelOrder) && !stagedInvestigationUnlocked) {
         btn.disabled = true;
     }
@@ -757,7 +824,7 @@ function updateEntryCopy() {
     investigateFirstBtn.style.gridColumn = '';
 
     if (levelOrder === 2) {
-        entryTitle.textContent = 'Store Manager';
+        entryTitleText.textContent = 'Store Manager';
         entryText.textContent = 'The system shows egg inventory at only 100. I recommend ordering 50 cartons right now. Do you want to order immediately or inspect the sales and inventory data first?';
         acceptSuggestionBtn.textContent = 'Accept Suggestion and Order';
         investigateFirstBtn.textContent = 'I Want to Check Inventory and Sales First';
@@ -765,7 +832,7 @@ function updateEntryCopy() {
     }
 
     if (levelOrder === 3) {
-        entryTitle.textContent = 'Store Manager';
+        entryTitleText.textContent = 'Store Manager';
         entryText.textContent = 'The promotion drew strong reviews and sales growth over the weekend. I suggest we continue the same buy-one-get-one campaign immediately. Do you want to continue now or inspect the full promotion data first?';
         acceptSuggestionBtn.textContent = 'Accept Suggestion and Continue Promotion';
         investigateFirstBtn.textContent = 'I Want to Review the Full Promotion Data';
@@ -773,7 +840,7 @@ function updateEntryCopy() {
     }
 
     if (levelOrder === 4) {
-        entryTitle.textContent = 'Store Manager';
+        entryTitleText.textContent = 'Store Manager';
         entryText.textContent = "This month's revenue chart looks like a huge jump. I recommend doubling next month's marketing budget immediately. Do you want to expand the budget now or inspect the raw revenue data and chart first?";
         acceptSuggestionBtn.textContent = 'Accept Suggestion and Double Budget';
         investigateFirstBtn.textContent = 'I Want to Check the Raw Revenue Data First';
@@ -781,7 +848,7 @@ function updateEntryCopy() {
     }
 
     if (levelOrder === 5) {
-        entryTitle.textContent = 'Store Manager';
+        entryTitleText.textContent = 'Store Manager';
         entryText.textContent = 'Supplier A shows a higher overall margin than Supplier B. I recommend choosing Supplier A immediately. Do you want to choose now or verify the detailed category data for both suppliers first?';
         acceptSuggestionBtn.textContent = 'Accept Suggestion and Choose Supplier A';
         investigateFirstBtn.textContent = 'I Want to Verify Both Suppliers in Detail';
@@ -789,7 +856,7 @@ function updateEntryCopy() {
     }
 
     if (levelOrder === 6) {
-        entryTitle.textContent = 'Store Manager';
+        entryTitleText.textContent = 'Store Manager';
         entryText.textContent = 'We have received several late-night complaints saying the store closes too early. I recommend extending business hours from 10 PM to midnight immediately. Do you want to extend now or inspect the full customer-flow data first?';
         acceptSuggestionBtn.textContent = 'Accept Suggestion and Extend Hours';
         investigateFirstBtn.textContent = 'I Want to Review Full Customer-Flow Data';
@@ -797,8 +864,8 @@ function updateEntryCopy() {
     }
 
     if (levelOrder === 7) {
-        entryTitle.textContent = 'Store Manager';
-        entryText.textContent = 'The takeout records from Meituan and Ele.me are messy, and finance cannot reconcile the real result. Please clean the order data, remove duplicates, unify the units, and tell me whether the channel is profitable or loss-making.';
+        entryTitleText.textContent = 'Store Manager';
+        entryText.textContent = 'The takeout records from Platform A and Platform B are messy, and finance cannot reconcile the real result. Please clean the order data, remove duplicates, unify the units, and tell me whether the channel is profitable or loss-making.';
         acceptSuggestionBtn.style.display = 'none';
         investigateFirstBtn.style.gridColumn = '1 / -1';
         investigateFirstBtn.textContent = 'Start Reconciliation Work';
@@ -806,7 +873,7 @@ function updateEntryCopy() {
     }
 
     const managerItem = levelConfig.items.find((item) => item.item_code === 'npc_manager');
-    entryTitle.textContent = managerItem ? managerItem.title : 'Store Manager';
+    entryTitleText.textContent = managerItem ? managerItem.title : 'Store Manager';
     entryText.textContent = managerItem ? managerItem.content_text : 'Yesterday demand exploded. We should double the order quantity right now and move fast.';
     acceptSuggestionBtn.textContent = 'Accept Suggestion and Order Now';
     investigateFirstBtn.textContent = 'I Want to Look Into the Cause First';
@@ -852,6 +919,16 @@ function getLevelSevenRawItem() {
     return levelConfig.items.find((item) => item.item_code === 'takeout_raw');
 }
 
+function getLevelSevenPlatformLabel(platform) {
+    if (platform === 'Meituan') {
+        return 'Platform A';
+    }
+    if (platform === 'Ele.me') {
+        return 'Platform B';
+    }
+    return platform;
+}
+
 function initializeLevelSevenRows() {
     const rawItem = getLevelSevenRawItem();
     if (!rawItem || !rawItem.content_json || !rawItem.content_json.rows) {
@@ -895,7 +972,7 @@ function renderLevelSevenProcessingDesk() {
     const visibleRows = levelSevenRows.filter((row) => !row.isDeleted);
     const rowsHtml = visibleRows.map((row) => `
         <tr>
-            <td>${row.platform}</td>
+            <td>${getLevelSevenPlatformLabel(row.platform)}</td>
             <td>${row.orderId}</td>
             <td>${row.item}</td>
             <td>${row.quantity}</td>
@@ -907,13 +984,9 @@ function renderLevelSevenProcessingDesk() {
                 </select>
             </td>
             <td>${row.revenue}</td>
-            <td><button type="button" class="primary-action level-seven-delete-btn" data-row-key="${row.rowKey}" style="margin-top:0; padding:8px 12px;">Delete Row</button></td>
+            <td><button type="button" class="primary-action level-seven-delete-btn" data-row-key="${row.rowKey}" style="margin-top:0; padding:8px 12px; background:#dc2626;">Delete Row</button></td>
         </tr>
     `).join('');
-
-    const statusText = levelSevenProcessingComplete
-        ? 'Processing complete: duplicate removed and all units normalized to pieces.'
-        : 'Processing required: remove the duplicate row and convert every remaining unit into pieces.';
 
     const summaryText = levelSevenProcessingComplete
         ? 'Core processing result: after cleanup, takeout revenue is $800 and the monthly channel result is a $1,200 loss.'
@@ -922,7 +995,6 @@ function renderLevelSevenProcessingDesk() {
     canvasArea.innerHTML = `
         <h3>Takeout Data Processing Desk</h3>
         <p>Use the center workspace to clean the raw takeout data before you make the final reconciliation decision.</p>
-        <p><strong>${statusText}</strong></p>
         <table border="1" cellpadding="8" cellspacing="0">
             <tr>
                 <th>Platform</th>

@@ -10,23 +10,23 @@ class Command(BaseCommand):
         level7, created = Level.objects.get_or_create(
             level_code='level_7',
             defaults={
-                'title': 'Multi-Platform Takeout Reconciliation Crisis',
-                'description': 'Standardize raw takeout order data from Meituan and Ele.me, remove duplicate records, unify counting units, and reconcile the real profit or loss of the takeout business.',
-                'objective_text': 'Clean the raw cross-platform takeout data, combine it with operating cost, and decide whether the takeout channel is actually profitable or loss-making.',
-                'briefing_title': 'Takeout Reconciliation Desk',
-                'briefing_text': 'The manager needs you to clean messy takeout order data and calculate the real operating result of the new delivery channels.',
-                'briefing_hint': 'Remove duplicate orders, normalize every quantity into pieces, and compare the cleaned revenue with full channel cost.',
+                'title': 'The Delivery Disaster',
+                'description': "It's time for a 'Deep Clean.' High volume doesn't always mean high profit-especially when the data is double-counted and the units are mismatched. Your goal is to standardize the chaos, strip out the noise, and find the actual bottom line.",
+                'objective_text': 'Standardize the raw platform feeds, delete the duplicates, and unify the measurement units to calculate the true Profit vs. Loss.',
+                'briefing_title': 'The Delivery Disaster',
+                'briefing_text': 'Delivery app A and Delivery app B are live, but finance says the order data is a mess and no one knows whether the channel is really making money.',
+                'briefing_hint': 'Before you trust the order volume, clean the feed, normalize the units, and reconcile the real costs.',
                 'order': 7,
                 'is_active': True,
             },
         )
         if not created:
-            level7.title = 'Multi-Platform Takeout Reconciliation Crisis'
-            level7.description = 'Standardize raw takeout order data from Meituan and Ele.me, remove duplicate records, unify counting units, and reconcile the real profit or loss of the takeout business.'
-            level7.objective_text = 'Clean the raw cross-platform takeout data, combine it with operating cost, and decide whether the takeout channel is actually profitable or loss-making.'
-            level7.briefing_title = 'Takeout Reconciliation Desk'
-            level7.briefing_text = 'The manager needs you to clean messy takeout order data and calculate the real operating result of the new delivery channels.'
-            level7.briefing_hint = 'Remove duplicate orders, normalize every quantity into pieces, and compare the cleaned revenue with full channel cost.'
+            level7.title = 'The Delivery Disaster'
+            level7.description = "It's time for a 'Deep Clean.' High volume doesn't always mean high profit-especially when the data is double-counted and the units are mismatched. Your goal is to standardize the chaos, strip out the noise, and find the actual bottom line."
+            level7.objective_text = 'Standardize the raw platform feeds, delete the duplicates, and unify the measurement units to calculate the true Profit vs. Loss.'
+            level7.briefing_title = 'The Delivery Disaster'
+            level7.briefing_text = 'Delivery app A and Delivery app B are live, but finance says the order data is a mess and no one knows whether the channel is really making money.'
+            level7.briefing_hint = 'Before you trust the order volume, clean the feed, normalize the units, and reconcile the real costs.'
             level7.order = 7
             level7.is_active = True
             level7.save()
@@ -45,40 +45,59 @@ class Command(BaseCommand):
 
         items = [
             {
-                'category': resolved_categories['report'],
-                'item_code': 'takeout_raw',
-                'title': 'Raw Multi-Platform Takeout Orders',
-                'content_type': 'table',
-                'content_text': 'The raw order sheet mixes Meituan and Ele.me data. It contains 5 records, one duplicate order, and mixed units such as dozen, portion, and piece.',
-                'content_json': {
-                    'headers': ['Platform', 'Order ID', 'Item', 'Quantity', 'Unit', 'Revenue'],
-                    'rows': [
-                        ['Meituan', 'MT1001', 'Eggs', '1', 'Dozen', '$240'],
-                        ['Meituan', 'MT1002', 'Eggs', '3', 'Portion', '$120'],
-                        ['Ele.me', 'EM2001', 'Eggs', '10', 'Piece', '$200'],
-                        ['Ele.me', 'EM2002', 'Eggs', '1', 'Dozen', '$240'],
-                        ['Meituan', 'MT1002', 'Eggs', '3', 'Portion', '$120'],
-                    ],
-                    'duplicate_order_id': 'MT1002',
-                },
+                'category': resolved_categories['npc'],
+                'item_code': 'NPC_manager',
+                'title': 'Store Manager',
+                'content_type': 'text',
+                'content_text': (
+                    'The delivery tablets are buzzing non-stop! Between Delivery app A and Delivery app B, we are moving massive volume. Finance is stressed about the messy spreadsheets, but I say orders are orders - as long as the bags are going out the door, we are winning. Let us keep the momentum going!'
+                ),
                 'is_key_item': True,
                 'sort_order': 1,
             },
             {
-                'category': resolved_categories['external'],
-                'item_code': 'unit_rule',
-                'title': 'Takeout Unit Conversion Rule',
-                'content_type': 'text',
-                'content_text': 'Use a single unit for reconciliation: 1 dozen = 12 pieces, 1 portion = 2 pieces, and every order must be normalized into pieces before you calculate the result.',
+                'category': resolved_categories['report'],
+                'item_code': 'takeout_raw',
+                'title': 'Raw Multi-Platform Takeout Orders',
+                'content_type': 'table',
+                'content_text': "Digital Feed Audit: This is a total mess. We've got Meituan and Ele.me data bleeding into one sheet, duplicate IDs popping up, and units all over the place-dozens, portions, pieces... it's impossible to see our real sales volume in this state.",
+                'content_json': {
+                    'headers': ['Platform', 'Order ID', 'Timestamp', 'Item', 'Qty', 'Unit', 'Unit Price'],
+                    'rows': [
+                        ['Delivery app A', 'A-009871', '2026-03-28 18:42', 'Eggs', '1', 'dozen', '$4.80'],
+                        ['Delivery app B', 'B-120044', '2026/03/28 18:44', 'Egg (grade A)', '12', 'pcs', '$0.40'],
+                        ['Delivery app A', 'A-009872', '2026-03-28 19:03', 'Chicken wings', '2', 'portion', '$6.50'],
+                        ['Delivery app B', 'B-120051', '2026/03/28 19:04', 'Wings', '4', 'pcs', '$1.62'],
+                        ['Delivery app A', 'A-009873', '2026-03-28 19:20', 'Strawberries', '0.5', 'kg', '$7.00'],
+                        ['Delivery app B', 'B-120066', '2026/03/28 19:21', 'Strawberries', '500', 'g', '$0.014'],
+                        ['Delivery app A', 'A-009875', '2026-03-28 19:55', 'Eggs', '12', 'pcs', '$0.40'],
+                        ['Delivery app A', 'A-009876', '2026-03-28 20:10', 'Eggs', '1', 'doz', '$4.80'],
+                        ['Delivery app B', 'B-120090', '2026/03/28 20:11', 'Eggs', '1', 'dozen', '$4.80'],
+                        ['Delivery app A', 'A-009877', '2026-03-28 20:40', 'Chicken wings', '2', 'PORTION', '$6.50'],
+                        ['Delivery app B', 'B-120103', '2026/03/28 20:58', 'Eggs', '0', 'pcs', '$0.40'],
+                        ['Delivery app A', 'A-009879', '2026-03-28 21:05', 'Chicken wings', '1', 'portion', '$6.50'],
+                        ['Delivery app B', 'B-120103', '2026/03/28 20:58', 'Eggs', '0', 'pcs', '$0.40'],
+                    ],
+                    'duplicate_order_id': 'B-120103',
+                },
                 'is_key_item': True,
                 'sort_order': 2,
+            },
+            {
+                'category': resolved_categories['external'],
+                'item_code': 'unit_rule',
+                'title': 'Data Processing Guide',
+                'content_type': 'text',
+                'content_text': "Cleanup Protocol: We can't trust the math until the data is clean. Step 1: Scrub the duplicate rows. Step 2: Normalize every unit into 'pieces' (1 dozen = 12, 1 portion = 2). Once the sheet is standardized, the real profit story will finally reveal itself.",
+                'is_key_item': True,
+                'sort_order': 3,
             },
             {
                 'category': resolved_categories['report'],
                 'item_code': 'takeout_cost',
                 'title': 'Takeout Operating Cost Data',
                 'content_type': 'table',
-                'content_text': 'The takeout channel charges a 15% platform fee, packaging costs $2 per order, delivery subsidy costs $5 per order, and the monthly fixed operating cost is $3,000.',
+                'content_text': "The Real Margin: Every order carries a 15% platform fee, plus $2 for packaging and a $5 delivery subsidy. Add in our $3,000 monthly fixed overhead, and we're burning cash fast. Unless our 'cleaned' order count is high enough, we're essentially paying for the privilege of delivering food.",
                 'content_json': {
                     'headers': ['Cost Item', 'Value'],
                     'rows': [
@@ -89,15 +108,6 @@ class Command(BaseCommand):
                         ['Exercise Reconciliation Result', 'Cleaned revenue $800, monthly net loss $1,200'],
                     ],
                 },
-                'is_key_item': True,
-                'sort_order': 3,
-            },
-            {
-                'category': resolved_categories['external'],
-                'item_code': 'takeout_guide',
-                'title': 'Data Processing Guide',
-                'content_type': 'text',
-                'content_text': 'Step 1: remove the duplicate order row. Step 2: change every unit into piece. Once the cleaned dataset is consistent, the system will unlock the reconciliation decision.',
                 'is_key_item': True,
                 'sort_order': 4,
             },
@@ -117,11 +127,11 @@ class Command(BaseCommand):
             level=level7,
             defaults={
                 'title': 'Takeout Reconciliation Decision',
-                'target_text': 'Complete the data cleanup, combine the cleaned orders with channel cost, and judge whether the takeout business is truly profitable or loss-making.',
+                'target_text': 'After cleaning the data and reconciling the costs, what is the real story of the delivery channel?',
                 'decision_type': 'single_choice',
                 'config_json': {
-                    'options': ['Takeout Channel Profitable', 'Takeout Channel Loss-Making'],
-                    'unit': 'USD',
+                    'options': ['Delivery Channel is Profitable', 'Delivery Channel is in Loss'],
+                    'unit': '',
                 },
             },
         )
@@ -129,17 +139,17 @@ class Command(BaseCommand):
         rules = [
             {
                 'rule_name': 'success_takeout_loss',
-                'condition_json': {'selected_value': 'Takeout Channel Loss-Making'},
+                'condition_json': {'selected_value': 'Delivery Channel is in Loss'},
                 'is_success': True,
-                'message': 'Congratulations. You completed the cross-platform data cleanup, removed duplicate orders, unified the units, and correctly reconciled the real takeout result. The channel is loss-making, and you have earned the graduation certificate.',
+                'message': "Absolute Legend! You scrubbed the data, deleted the 'ghost' orders, and finally made the units match. By cutting through the noise, you saw what the manager missed: this delivery channel is burning cash, not making it. You've officially reconciled the truth and earned your Graduation Certificate. The store is safe in your hands!",
                 'score': 50,
                 'next_action': 'certificate',
             },
             {
                 'rule_name': 'fail_takeout_profit',
-                'condition_json': {'selected_value': 'Takeout Channel Profitable'},
+                'condition_json': {'selected_value': 'Delivery Channel is Profitable'},
                 'is_success': False,
-                'message': 'Too bad. Your reconciliation missed the impact of duplicate orders, mixed units, and full channel cost. The takeout business is not profitable, and misjudging it would keep the supermarket trapped in a loss-making operation.',
+                'message': "Ouch-you got caught in the 'Volume Trap.' By missing those duplicate orders and mismatched units, the numbers looked better than they actually were. This operation is deep in the red, and keeping it open is just lighting money on fire. Remember: high volume is meaningless if the data behind it is a mess!",
                 'score': 0,
                 'next_action': 'restart',
             },

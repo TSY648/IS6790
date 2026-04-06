@@ -66,8 +66,7 @@
                 <table class="summary-table">
                     <thead>
                         <tr>
-                            <th>Level Number</th>
-                            <th>Core Dimension</th>
+                            <th>Level</th>
                             <th>Dimension Core Knowledge Points</th>
                             <th>Difficulty Level</th>
                         </tr>
@@ -75,8 +74,7 @@
                     <tbody>
                         {% for row in summary_rows %}
                         <tr>
-                            <td>{{ row.level }}</td>
-                            <td>{{ row.dimension }}</td>
+                            <td>Level {{ row.level }}: {{ row.title }}</td>
                             <td>{{ row.knowledge }}</td>
                             <td>{{ row.difficulty }}</td>
                         </tr>

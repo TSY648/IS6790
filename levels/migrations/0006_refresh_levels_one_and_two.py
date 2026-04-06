@@ -100,7 +100,7 @@ def refresh_levels_one_and_two(apps, schema_editor):
                 {'category': 'external', 'item_code': 'competitor_calendar', 'title': 'Competitor Promotion Calendar', 'content_type': 'text', 'content_text': 'The nearby competitor is ending its fruit coupon on Sunday. Demand may normalize slightly, but there is no evidence of a lasting demand surge large enough to justify a doubled order.', 'sort_order': 8},
             ],
             'decision': {
-                'title': 'How many kilograms of strawberries should we order for next week?',
+                'title': 'How many kilograms of strawberries should we order for tomorrow?',
                 'target_text': 'Choose the order quantity that feels most reasonable after looking through the clues.',
                 'config_json': {'options': [100, 200, 300], 'unit': 'kg'},
             },

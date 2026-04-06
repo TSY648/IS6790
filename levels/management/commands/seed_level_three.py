@@ -10,23 +10,23 @@ class Command(BaseCommand):
         level3, created = Level.objects.get_or_create(
             level_code='level_3',
             defaults={
-                'title': 'Promotion Effect Misjudgment Crisis',
-                'description': 'Identify the survivorship bias in fresh-produce promotions, where partial hot-sales feedback hides the overall profit loss, then judge the real promotion effect and decide whether the campaign should continue.',
-                'objective_text': 'Analyze the full promotion dataset, judge the real campaign result, and decide whether the promotion should continue or stop.',
-                'briefing_title': 'Promotion Performance Review Desk',
-                'briefing_text': 'Weekend sales in fresh produce rose sharply during the buy-one-get-one campaign, and the store manager wants to keep the same promotion going.',
-                'briefing_hint': 'Do not confuse strong reviews and sales growth with a healthy campaign result. Check the profit outcome before deciding.',
+                'title': 'The Promotion Trap',
+                'description': 'The store feels busy and customers are happy. Before we extend anything, pressure-test the results: did the promo create profitable demand or just expensive activity?',
+                'objective_text': 'Tally up the real costs, weigh the sales against the margins, and make the call: is it time to keep the promo going, or pull the plug before we go broke?',
+                'briefing_title': 'Buy One Get One',
+                'briefing_text': 'Weekend produce sales were loud, busy, and full of glowing reviews. The Store Manager wants to extend the BOGO deal right away.',
+                'briefing_hint': 'Do not let five-star reviews make the decision for you. Check the full P&L before you greenlight anything.',
                 'order': 3,
                 'is_active': True,
             },
         )
         if not created:
-            level3.title = 'Promotion Effect Misjudgment Crisis'
-            level3.description = 'Identify the survivorship bias in fresh-produce promotions, where partial hot-sales feedback hides the overall profit loss, then judge the real promotion effect and decide whether the campaign should continue.'
-            level3.objective_text = 'Analyze the full promotion dataset, judge the real campaign result, and decide whether the promotion should continue or stop.'
-            level3.briefing_title = 'Promotion Performance Review Desk'
-            level3.briefing_text = 'Weekend sales in fresh produce rose sharply during the buy-one-get-one campaign, and the store manager wants to keep the same promotion going.'
-            level3.briefing_hint = 'Do not confuse strong reviews and sales growth with a healthy campaign result. Check the profit outcome before deciding.'
+            level3.title = 'The Promotion Trap'
+            level3.description = 'The store feels busy and customers are happy. Before we extend anything, pressure-test the results: did the promo create profitable demand or just expensive activity?'
+            level3.objective_text = 'Tally up the real costs, weigh the sales against the margins, and make the call: is it time to keep the promo going, or pull the plug before we go broke?'
+            level3.briefing_title = 'Buy One Get One'
+            level3.briefing_text = 'Weekend produce sales were loud, busy, and full of glowing reviews. The Store Manager wants to extend the BOGO deal right away.'
+            level3.briefing_hint = 'Do not let five-star reviews make the decision for you. Check the full P&L before you greenlight anything.'
             level3.order = 3
             level3.is_active = True
             level3.save()
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 'title': 'Store Manager',
                 'content_type': 'text',
                 'content_text': (
-                    '"The weekend promotion exploded. We received a lot of positive reviews, and sales looked great. Let us continue the same buy-one-get-one promotion this week too."'
+                    'The weekend promo was a total explosion! We got buried in 5-star reviews and the sales numbers looked incredible. There is no reason to stop now - let us run the same BOGO deal again this week!'
                 ),
                 'is_key_item': True,
                 'sort_order': 1,
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 'title': 'Promotion Customer Reviews',
                 'content_type': 'text',
                 'content_text': (
-                    'The campaign received more than 20 positive reviews over the weekend. Customers praised the low prices, freshness, and value, and some comments said they would buy again.'
+                    'Social Buzz: the campaign was a hit with the crowd, racking up over 20 glowing reviews over the weekend. Customers are loving the freebies - but can we afford to keep them happy at this price?'
                 ),
                 'is_key_item': True,
                 'sort_order': 2,
@@ -72,13 +72,17 @@ class Command(BaseCommand):
                 'title': 'Promotion Gross Sales Data',
                 'content_type': 'table',
                 'content_text': (
-                    'Weekend fresh-produce gross sales rose 40% compared with a normal weekday baseline, but most of the growth came from low-margin traffic-driving items. Higher sales volume does not automatically mean higher profit.'
+                    'Check the volume: produce sales jumped 40% over our normal baseline. But keep your eyes peeled - most of that growth was in low-margin loss leaders. Remember, moving more boxes does not always mean moving more money.'
                 ),
                 'content_json': {
-                    'headers': ['Metric', 'Before Promotion', 'During Promotion', 'Change'],
+                    'headers': ['Line item', 'Baseline weekend', 'Promo weekend (BOGO)', 'Change'],
                     'rows': [
-                        ['Fresh Produce Gross Sales', '$10,000', '$14,000', '+40%'],
-                        ['Low-Margin Traffic Items Share', '35%', '68%', '+33 pts'],
+                        ['Gross sales (revenue)', '$10,000', '$13,800', '+$3,800'],
+                        ['COGS (paid product cost)', '($6,000)', '($8,970)', '($2,970)'],
+                        ['Gross profit (before promo costs)', '$4,000 (40%)', '$4,830 (35%)', '+$830'],
+                        ['Less: BOGO free item cost (giveaway COGS)', '$0', '($2,550)', '($2,550)'],
+                        ['Less: incremental labour / handling', '$0', '($2,780)', '($2,780)'],
+                        ['Net profit (after promo costs)', '$4,000', '($500)', '($4,500)'],
                     ],
                     'src': '/static/levels/level3/promotion-gross-sales-trend.svg',
                     'alt': 'Daily sales trend of fresh products last week',
@@ -92,15 +96,18 @@ class Command(BaseCommand):
                 'title': 'Promotion Gross Profit Data',
                 'content_type': 'table',
                 'content_text': (
-                    'During the promotion, overall fresh-produce gross margin fell to 35%. After subtracting promotional subsidy and labor cost, the category lost $500 overall.'
+                    'The bottom line: our overall margin tanked to 35% during the promo. Once you factor in the cost of the freebies and the extra labour, the department actually lost $500. This win is costing us serious cash.'
                 ),
                 'content_json': {
-                    'headers': ['Metric', 'Value'],
+                    'table_title': 'Promotion Profit Table (Weekend P&L View)',
+                    'headers': ['Line item', 'Baseline weekend', 'Promo weekend (BOGO)', 'Change'],
                     'rows': [
-                        ['Gross Margin During Promotion', '35%'],
-                        ['Promotional Subsidy', '$300'],
-                        ['Extra Labor Cost', '$200'],
-                        ['Net Profit Impact', '-$500'],
+                        ['Gross sales (revenue)', '$10,000', '$13,800', '+$3,800'],
+                        ['COGS (paid product cost)', '($6,000)', '($8,970)', '($2,970)'],
+                        ['<strong>Gross profit (before promo costs)</strong>', '<strong>$4,000 (40%)</strong>', '<strong>$4,830 (35%)</strong>', '<strong>+$830</strong>'],
+                        ['Less: BOGO “free item” cost (giveaway COGS)', '$0', '($2,550)', '($2,550)'],
+                        ['Less: incremental labour / handling', '$0', '($2,780)', '($2,780)'],
+                        ['<strong>Net profit (after promo costs)</strong>', '<strong>$4,000</strong>', '<strong>($500)</strong>', '<strong>($4,500)</strong>'],
                     ],
                 },
                 'is_key_item': True,
@@ -121,8 +128,8 @@ class Command(BaseCommand):
         DecisionConfig.objects.update_or_create(
             level=level3,
             defaults={
-                'title': 'Fresh Produce Promotion Decision',
-                'target_text': 'Identify the survivorship bias in the promotion evidence, judge the real campaign outcome, and decide whether the promotion should continue.',
+                'title': 'Promotion Decision',
+                'target_text': 'After reviewing the promo results end-to-end, what is the recommendation for next week?',
                 'decision_type': 'single_choice',
                 'config_json': {
                     'options': ['Continue Promotion', 'Stop Promotion'],
@@ -137,7 +144,7 @@ class Command(BaseCommand):
                 'condition_json': {'selected_value': 'Stop Promotion'},
                 'is_success': True,
                 'message': (
-                    'Congratulations. You recognized the survivorship bias in the promotion evidence and were not misled by partial feedback. The promotion increased gross sales, but real profit fell, so stopping it prevents further losses.'
+                    "Major win! You did not let those shiny 5-star reviews distract you from the bottom line. You spotted the survivorship bias and realized that while the sales looked huge, the profits were actually taking a hit. By pulling the plug on the promo, you just saved the store from a massive budget leak. Great eye!"
                 ),
                 'score': 50,
                 'next_action': 'next_level',
@@ -147,7 +154,7 @@ class Command(BaseCommand):
                 'condition_json': {'selected_value': 'Continue Promotion'},
                 'is_success': False,
                 'message': (
-                    "Too bad. You were misled by the survivorship bias in the store manager's feedback, ignored the total profit loss caused by the campaign, and chose to continue a promotion that would keep expanding the loss."
+                    "Tough break. You got caught up in the hype! By following the manager's lead and those happy customer reviews, you missed the real story: this campaign was actually draining our cash. It turns out that survivorship bias is tricky - if you only look at the happy fans, you miss the total loss on the balance sheet."
                 ),
                 'score': 0,
                 'next_action': 'restart',

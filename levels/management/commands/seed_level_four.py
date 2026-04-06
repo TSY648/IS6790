@@ -10,23 +10,23 @@ class Command(BaseCommand):
         level4, created = Level.objects.get_or_create(
             level_code='level_4',
             defaults={
-                'title': 'Revenue Growth Misread Crisis',
-                'description': 'Identify the misleading baseline in a revenue chart, compare the chart with the raw revenue data and marketing relationship, and decide how the marketing budget should be adjusted.',
-                'objective_text': 'Verify the raw data behind the chart, judge the real revenue increase, and choose whether to double, maintain, or reduce the marketing budget.',
-                'briefing_title': 'Marketing Budget Review Desk',
-                'briefing_text': "The store manager saw a dramatic revenue-growth chart and wants to expand next month's marketing budget immediately.",
-                'briefing_hint': 'Do not trust the visual jump alone. Compare the chart baseline with the raw revenue and budget relationship first.',
+                'title': 'The Chart Trap',
+                'description': 'Cross-check a headline visual against the raw figures: confirm the real month-over-month change, sanity-check the scale and baseline choices, and make a budget recommendation that holds up outside a slide deck.',
+                'objective_text': 'Validate the chart against the underlying numbers, compute the true month-over-month change, and recommend the next marketing budget level.',
+                'briefing_title': 'The $10,000 Verdict',
+                'briefing_text': 'The Store Manager is ready to increase the marketing budget after seeing a dramatic-looking revenue chart.',
+                'briefing_hint': 'Before anyone touches the budget, check the raw numbers behind the graph and make sure the chart is not playing tricks on you.',
                 'order': 4,
                 'is_active': True,
             },
         )
         if not created:
-            level4.title = 'Revenue Growth Misread Crisis'
-            level4.description = 'Identify the misleading baseline in a revenue chart, compare the chart with the raw revenue data and marketing relationship, and decide how the marketing budget should be adjusted.'
-            level4.objective_text = 'Verify the raw data behind the chart, judge the real revenue increase, and choose whether to double, maintain, or reduce the marketing budget.'
-            level4.briefing_title = 'Marketing Budget Review Desk'
-            level4.briefing_text = "The store manager saw a dramatic revenue-growth chart and wants to expand next month's marketing budget immediately."
-            level4.briefing_hint = 'Do not trust the visual jump alone. Compare the chart baseline with the raw revenue and budget relationship first.'
+            level4.title = 'The Chart Trap'
+            level4.description = 'Cross-check a headline visual against the raw figures: confirm the real month-over-month change, sanity-check the scale and baseline choices, and make a budget recommendation that holds up outside a slide deck.'
+            level4.objective_text = 'Validate the chart against the underlying numbers, compute the true month-over-month change, and recommend the next marketing budget level.'
+            level4.briefing_title = 'The $10,000 Verdict'
+            level4.briefing_text = 'The Store Manager is ready to increase the marketing budget after seeing a dramatic-looking revenue chart.'
+            level4.briefing_hint = 'Before anyone touches the budget, check the raw numbers behind the graph and make sure the chart is not playing tricks on you.'
             level4.order = 4
             level4.is_active = True
             level4.save()
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 'title': 'Store Manager',
                 'content_type': 'text',
                 'content_text': (
-                    '"Revenue surged this month. The whole chart is climbing fast, so if we double the marketing budget next month, we should earn even more."'
+                    'The chart suggests revenue is trending up this month. I want to scale marketing next month.'
                 ),
                 'is_key_item': True,
                 'sort_order': 1,
@@ -61,10 +61,10 @@ class Command(BaseCommand):
                 'title': 'Monthly Revenue Growth Trend',
                 'content_type': 'image',
                 'content_text': (
-                    "The revenue trend displays this month's revenue moving from 82,000 to 83,000, creating the visual impression of a strong upward rise."
+                    'Revenue moved from $82,000 to $83,000 this month. Because of how the chart is zoomed in, it looks like a massive upward climb. Do not let the steep angle fool you - look at the actual numbers on the side.'
                 ),
                 'content_json': {
-                    'src': '/static/levels/level4/monthly-revenue-growth-trend.svg',
+                    'src': '/static/levels/level4/monthly-revenue-growth-trend.png',
                     'alt': 'Monthly revenue growth trend',
                 },
                 'is_key_item': True,
@@ -76,14 +76,26 @@ class Command(BaseCommand):
                 'title': 'Raw Revenue Data Table',
                 'content_type': 'table',
                 'content_text': (
-                    "This month's revenue is 83,000, up only 1,000 from last month's 82,000. That is a normal 1.2% increase, not a dramatic leap."
+                    "The hard numbers: revenue is $83,000, which is only $1,000 more than last month. That's a tiny 1.2% nudge, not the 'dramatic leap' the manager thinks he's seeing. It's basically business as usual."
                 ),
                 'content_json': {
-                    'headers': ['Month', 'Revenue', 'Change', 'Growth Rate'],
+                    'headers': ['Metric', 'Current Month Data', 'Analysis Notes'],
                     'rows': [
-                        ['Last Month', '$82,000', '-', '-'],
-                        ['This Month', '$83,000', '+$1,000', '1.2%'],
+                        ['Total Marketing Spend', '$1,000', 'Budget for social ads & local flyers.'],
+                        ['Total Revenue Growth', '$2,500', "Compared to last month's baseline."],
+                        ['Total Store Traffic', '4,000 Shoppers', 'Total unique visitors this month.'],
+                        ['Campaign Leads', '0.5% (20 Shoppers)', "Customers using the campaign's promo code."],
                     ],
+                    'axis_fixer': {
+                        'button_label': 'Show Full Scale (Start at $0)',
+                        'reset_label': 'Back to Distorted View',
+                        'before_src': '/static/levels/level4/monthly-revenue-growth-trend.png',
+                        'after_src': '/static/levels/level4/monthly-revenue-growth-full-scale.svg',
+                        'before_alt': 'Dual-axis distorted monthly revenue growth chart',
+                        'after_alt': 'Full-scale monthly revenue growth chart starting at zero',
+                        'success_text': 'Baseline reset applied. The dramatic jump flattens out once the chart starts at $0.',
+                        'reset_text': 'Distorted view restored. The zoomed baseline makes the change look much bigger again.',
+                    },
                 },
                 'is_key_item': True,
                 'sort_order': 3,
@@ -94,14 +106,14 @@ class Command(BaseCommand):
                 'title': 'Marketing Budget and Revenue Relation Data',
                 'content_type': 'table',
                 'content_text': (
-                    "This month's marketing budget was $5,000, but the revenue increase was not directly caused by extra marketing. Most growth came from natural community traffic."
+                    'Did marketing do this? We spent $5,000 on ads, but that $1,000 revenue bump was not even caused by the campaign. Most of our growth came from natural foot traffic. Doubling the budget here might just be throwing money away.'
                 ),
                 'content_json': {
                     'headers': ['Metric', 'Value'],
                     'rows': [
                         ['Marketing Budget This Month', '$5,000'],
                         ['Revenue Increase', '$1,000'],
-                        ['Primary Driver', 'Natural community traffic'],
+                        ['Primary Driver', 'Natural foot traffic'],
                     ],
                 },
                 'is_key_item': True,
@@ -123,11 +135,11 @@ class Command(BaseCommand):
             level=level4,
             defaults={
                 'title': 'Marketing Budget Decision',
-                'target_text': 'Identify the baseline mismatch, judge the true revenue change, and choose the most reasonable budget adjustment.',
+                'target_text': "Decision time: does a $1,000 revenue bump justify doubling our spend? Now that you have spotted the misleading baseline, how should we play the next marketing move?",
                 'decision_type': 'single_choice',
                 'config_json': {
                     'options': ['Double Budget', 'Maintain Budget', 'Reduce Budget'],
-                    'unit': 'USD',
+                    'unit': '',
                 },
             },
         )
@@ -138,7 +150,7 @@ class Command(BaseCommand):
                 'condition_json': {'selected_value': 'Maintain Budget'},
                 'is_success': True,
                 'message': (
-                    'Congratulations. You identified the misleading chart baseline, recognized that the apparent surge was only a modest increase, and discovered that revenue was not strongly driven by marketing. Maintaining the budget avoids unnecessary cost waste.'
+                    'Nailed it! You did not let that steep chart angle fool you. By spotting the misleading baseline, you realized that a 1.2% nudge is not explosive growth - and definitely does not justify doubling the budget. By maintaining our current spend, you protected our profits and kept us from wasting cash on hype.'
                 ),
                 'score': 50,
                 'next_action': 'next_level',
@@ -148,7 +160,7 @@ class Command(BaseCommand):
                 'condition_json': {'selected_value': 'Double Budget'},
                 'is_success': False,
                 'message': (
-                    "Too bad. You were misled by the chart's baseline mismatch and treated a 1.2% increase like explosive growth. Doubling the marketing budget would raise cost without protecting overall profit."
+                    'Tough break - the chart got the best of you! That rocket-ship rise was actually a visual trick caused by a shifted baseline. You treated a tiny 1.2% bump like a massive breakthrough, and now we are doubling our costs for almost zero gain. Next time, always check the Y-axis before you open the wallet!'
                 ),
                 'score': 0,
                 'next_action': 'restart',
@@ -158,7 +170,7 @@ class Command(BaseCommand):
                 'condition_json': {'selected_value': 'Reduce Budget'},
                 'is_success': False,
                 'message': (
-                    'Too bad. You were too conservative. The modest revenue growth still benefits from maintaining the current budget, and reducing it could weaken stable customer traffic. Maintaining the budget is the most reasonable choice.'
+                    'A bit too cautious! While you were right not to fall for the massive jump, cutting the budget entirely was a step too far. We still have steady traffic coming in, and slashing the spend now could choke off our stable growth. The sweet spot was staying the course.'
                 ),
                 'score': 0,
                 'next_action': 'restart',

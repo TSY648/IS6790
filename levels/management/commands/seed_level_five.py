@@ -10,23 +10,23 @@ class Command(BaseCommand):
         level5, created = Level.objects.get_or_create(
             level_code='level_5',
             defaults={
-                'title': 'Supplier Choice Conflict Crisis',
-                'description': "Identify Simpson's paradox in supplier selection, compare overall supplier profit with category-level profit, and choose the supplier that best fits the supermarket's fresh-produce mix.",
-                'objective_text': "Analyze both suppliers' total profit and detailed category profit, match them to the store's fresh-produce structure, and choose the supplier that produces the best real profit outcome.",
-                'briefing_title': 'Supplier Selection Review Desk',
-                'briefing_text': 'The current core fresh-produce supplier contract is expiring, and the store manager wants your support in choosing the next supplier.',
-                'briefing_hint': "Do not trust the higher overall margin alone. Compare subgroup profit with the store's actual category mix.",
+                'title': 'The Contract Conflict',
+                'description': "It is decision time on our core produce contract. On paper, this looks like a straightforward choice, but the best overall deal might not be the best deal for our specific shelves. Your mission is to audit the category performance for both candidates and align their pricing strengths with our actual inventory mix.",
+                'objective_text': "Analyze the margin breakdown, match it to the store's sales structure, and pick the partner that maximizes our real-world profit.",
+                'briefing_title': 'The Contract Conflict',
+                'briefing_text': 'Procurement needs a supplier decision today, and the Store Manager is ready to choose based on the summary line.',
+                'briefing_hint': 'Do not let the headline average make the call for you. Check which supplier actually wins in the categories that matter most here.',
                 'order': 5,
                 'is_active': True,
             },
         )
         if not created:
-            level5.title = 'Supplier Choice Conflict Crisis'
-            level5.description = "Identify Simpson's paradox in supplier selection, compare overall supplier profit with category-level profit, and choose the supplier that best fits the supermarket's fresh-produce mix."
-            level5.objective_text = "Analyze both suppliers' total profit and detailed category profit, match them to the store's fresh-produce structure, and choose the supplier that produces the best real profit outcome."
-            level5.briefing_title = 'Supplier Selection Review Desk'
-            level5.briefing_text = 'The current core fresh-produce supplier contract is expiring, and the store manager wants your support in choosing the next supplier.'
-            level5.briefing_hint = "Do not trust the higher overall margin alone. Compare subgroup profit with the store's actual category mix."
+            level5.title = 'The Contract Conflict'
+            level5.description = "It is decision time on our core produce contract. On paper, this looks like a straightforward choice, but the best overall deal might not be the best deal for our specific shelves. Your mission is to audit the category performance for both candidates and align their pricing strengths with our actual inventory mix."
+            level5.objective_text = "Analyze the margin breakdown, match it to the store's sales structure, and pick the partner that maximizes our real-world profit."
+            level5.briefing_title = 'The Contract Conflict'
+            level5.briefing_text = 'Procurement needs a supplier decision today, and the Store Manager is ready to choose based on the summary line.'
+            level5.briefing_hint = 'Do not let the headline average make the call for you. Check which supplier actually wins in the categories that matter most here.'
             level5.order = 5
             level5.is_active = True
             level5.save()
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 'title': 'Store Manager',
                 'content_type': 'text',
                 'content_text': (
-                    '"Supplier A has a total profit margin of 15%, while Supplier B is only at 12%. Let us just choose Supplier A and help the store make more money."'
+                    'Supplier A is offering a 15% total margin across the board, while Supplier B is trailing at 12%. Let us sign with A and start padding the store bottom line immediately.'
                 ),
                 'is_key_item': True,
                 'sort_order': 1,
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 'title': 'Supplier Overall Profit Data',
                 'content_type': 'table',
                 'content_text': (
-                    'Supplier A shows an overall profit margin of 15%, while Supplier B shows 12%. Looking only at the total number makes A appear better.'
+                    'Supplier A currently holds a 3% lead in total average margin compared to Supplier B. If we only look at the big-picture totals, Supplier A appears to be the more profitable partner for the year ahead.'
                 ),
                 'content_json': {
                     'headers': ['Supplier', 'Overall Profit Margin'],
@@ -75,17 +75,25 @@ class Command(BaseCommand):
             },
             {
                 'category': resolved_categories['report'],
-                'item_code': 'supplier_detail',
-                'title': 'Supplier Category-Level Profit Data',
+                'item_code': 'supplier_margin_breakdown',
+                'title': 'Supplier Category-Level Margin Breakdown',
                 'content_type': 'table',
                 'content_text': (
-                    'At the category level, Supplier B performs much better in high-margin fresh categories, while Supplier A performs better only in low-margin categories.'
+                    "This table shows each supplier's profit margin by produce category, alongside how much each category contributes to our store's total sales. To understand the real profit impact, consider not just which margin is higher, but where those margins apply in our actual sales mix."
                 ),
                 'content_json': {
-                    'headers': ['Supplier', 'High-Margin Categories', 'Low-Margin Categories'],
+                    'headers': ['Category', 'Product', 'Share of Store Sales', 'Supplier A Margin', 'Supplier B Margin'],
                     'rows': [
-                        ['Supplier A', '8%', '25%'],
-                        ['Supplier B', '20%', '5%'],
+                        ['Fresh', 'Vegetables', '18%', '10%', '16%'],
+                        ['Fresh', 'Meat & Poultry', '14%', '11%', '15%'],
+                        ['Fresh', 'Seafood', '12%', '12%', '17%'],
+                        ['Fresh', 'Fruits', '10%', '13%', '18%'],
+                        ['Food', 'Ready-to-Cook & Instant Meals', '8%', '14%', '16%'],
+                        ['Food', 'Rice, Grains & Cooking Oil', '10%', '20%', '6%'],
+                        ['Food', 'Dairy Products', '8%', '18%', '7%'],
+                        ['Daily Essentials', 'Personal & Home Care', '7%', '17%', '8%'],
+                        ['Daily Essentials', 'Paper Goods & Tissues', '7%', '15%', '7%'],
+                        ['Daily Essentials', 'Kitchen Supplies', '6%', '16%', '6%'],
                     ],
                 },
                 'is_key_item': True,
@@ -97,13 +105,13 @@ class Command(BaseCommand):
                 'title': 'Store Fresh-Produce Category Structure',
                 'content_type': 'table',
                 'content_text': (
-                    "The supermarket's fresh-produce mix is dominated by high-margin categories, which account for 80% of the business, while low-margin categories account for only 20%."
+                    "Our store's revenue is concentrated in a small number of high-volume, high-value fresh categories. Any supplier advantage in these categories will have a disproportionate impact on total profit."
                 ),
                 'content_json': {
-                    'headers': ['Category Mix', 'Store Share'],
+                    'headers': ['Category Group', 'Share of Store Sales'],
                     'rows': [
-                        ['High-Margin Fresh Categories', '80%'],
-                        ['Low-Margin Fresh Categories', '20%'],
+                        ['Top-Selling Fresh Categories', '80%'],
+                        ['Remaining Categories', '20%'],
                     ],
                 },
                 'is_key_item': True,
@@ -125,10 +133,10 @@ class Command(BaseCommand):
             level=level5,
             defaults={
                 'title': 'Fresh Produce Supplier Decision',
-                'target_text': "Recognize Simpson's paradox, combine the supplier data with the store's actual category mix, and choose the supplier that produces the better real profit outcome.",
+                'target_text': "Final verdict: it is time to sign the contract. Which supplier should the store choose?",
                 'decision_type': 'single_choice',
                 'config_json': {
-                    'options': ['Choose Supplier A', 'Choose Supplier B'],
+                    'options': ['Select Supplier A', 'Select Supplier B'],
                     'unit': '',
                 },
             },
@@ -137,20 +145,20 @@ class Command(BaseCommand):
         rules = [
             {
                 'rule_name': 'success_choose_b',
-                'condition_json': {'selected_value': 'Choose Supplier B'},
+                'condition_json': {'selected_value': 'Select Supplier B'},
                 'is_success': True,
                 'message': (
-                    "Congratulations. You recognized Simpson's paradox in the supplier comparison and were not misled by the overall profit figure alone. Because the supermarket is dominated by high-margin categories, Supplier B delivers the better real profit outcome."
+                    "Absolute legend! You did not let the 15% Total Margin headline distract you. By drilling into the category data, you spotted that Supplier B actually outperforms in the high-impact categories that make up 80% of our business. You just navigated Simpson's Paradox like a pro and chose the supplier that maximizes real profit - not just the average on paper. The store's bottom line will thank you."
                 ),
                 'score': 50,
                 'next_action': 'next_level',
             },
             {
                 'rule_name': 'fail_choose_a',
-                'condition_json': {'selected_value': 'Choose Supplier A'},
+                'condition_json': {'selected_value': 'Select Supplier A'},
                 'is_success': False,
                 'message': (
-                    "Too bad. You followed the higher overall profit figure and missed the category-level structure. Since 80% of the store's fresh produce is high-margin, choosing Supplier A would lower real profit significantly."
+                    "Ouch - you got caught in the average trap. While Supplier A had a higher total margin on paper, they actually underperformed in the high-margin categories where we do 80% of our business. By picking the bigger average instead of the better fit, we are actually going to see a profit drop this year."
                 ),
                 'score': 0,
                 'next_action': 'restart',

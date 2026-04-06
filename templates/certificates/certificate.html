@@ -180,7 +180,7 @@
         <div id="certificate-card" class="certificate-card">
             <div class="certificate-inner">
                 <span class="certificate-kicker">Completion Certificate</span>
-                <h1 class="certificate-title">Internship Manager Graduation Certificate</h1>
+                <h1 class="certificate-title">From Gut to Data Completion Certificate</h1>
                 <p class="certificate-subtitle">Awarded to the trainee manager who completed the current supermarket decision-making challenge and demonstrated data-informed operational judgment.</p>
 
                 <div class="certificate-body">
@@ -218,7 +218,7 @@
 
                 <div class="certificate-meta">
                     <div>Issued on {{ issued_at }}</div>
-                    <div>Product: Supermarket Manager Internship</div>
+                    <div>Product: From Gut to Data (Supermarket Edition)</div>
                     <div>Institution mark placeholder</div>
                 </div>
             </div>
@@ -237,6 +237,11 @@
 {% block extra_js %}
 <script>
 const totalLevels = {{ available_levels }};
+const levelTitles = {
+    {% for row in summary_rows %}
+    {{ row.level }}: "{{ row.title|escapejs }}",
+    {% endfor %}
+};
 
 function getSavedNumber(key) {
     const value = Number(localStorage.getItem(key) || '0');
@@ -271,7 +276,7 @@ function renderCertificateStats() {
         const row = document.createElement('div');
         row.className = 'breakdown-row';
         row.innerHTML = `
-            <strong>Level ${item.level}</strong>
+            <strong>Level ${item.level}: ${levelTitles[item.level] || ''}</strong>
             <span>Attempts: ${item.attempts || 0}</span>
             <span>Score: ${item.score}/50</span>
         `;
@@ -286,59 +291,189 @@ document.getElementById('play-again-btn').addEventListener('click', function () 
     window.location.href = '/story/opening/';
 });
 
-document.getElementById('save-certificate-btn').addEventListener('click', async function () {
-    const status = document.getElementById('save-status');
-    const card = document.getElementById('certificate-card');
-    const rect = card.getBoundingClientRect();
-    const clone = card.cloneNode(true);
-    clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+function escapeXml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
 
-    function copyStyles(sourceNode, targetNode) {
-        const computed = window.getComputedStyle(sourceNode);
-        for (const property of computed) {
-            targetNode.style.setProperty(
-                property,
-                computed.getPropertyValue(property),
-                computed.getPropertyPriority(property)
-            );
+function wrapSvgText(text, maxChars) {
+    const words = String(text).split(/\s+/).filter(Boolean);
+    const lines = [];
+    let currentLine = '';
+
+    words.forEach((word) => {
+        const nextLine = currentLine ? `${currentLine} ${word}` : word;
+        if (nextLine.length <= maxChars) {
+            currentLine = nextLine;
+        } else {
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+            currentLine = word;
         }
+    });
 
-        Array.from(sourceNode.children).forEach((child, index) => {
-            copyStyles(child, targetNode.children[index]);
-        });
+    if (currentLine) {
+        lines.push(currentLine);
     }
 
-    copyStyles(card, clone);
+    return lines;
+}
 
-    const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(rect.width)}" height="${Math.ceil(rect.height)}">
-            <foreignObject width="100%" height="100%">${new XMLSerializer().serializeToString(clone)}</foreignObject>
+function renderSvgTextLines(lines, x, y, lineHeight, cssClass) {
+    return lines.map((line, index) => `
+        <text x="${x}" y="${y + (index * lineHeight)}" class="${cssClass}">${escapeXml(line)}</text>
+    `).join('');
+}
+
+function buildCertificateSvg() {
+    const breakdown = buildCertificateStats();
+    const finalScore = breakdown.reduce((sum, item) => sum + item.score, 0);
+    const totalAttempts = breakdown.reduce((sum, item) => sum + item.attempts, 0);
+    const scoreRule = "{{ score_rule|escapejs }}";
+    const issuedAt = "{{ issued_at|escapejs }}";
+
+    const width = 1400;
+    const breakdownStartY = 690;
+    const breakdownRowHeight = 58;
+    const breakdownHeight = 70 + (breakdown.length * breakdownRowHeight);
+    const height = breakdownStartY + breakdownHeight + 130;
+
+    const subtitleLines = wrapSvgText(
+        'Awarded to the trainee manager who completed the current supermarket decision-making challenge and demonstrated data-informed operational judgment.',
+        95
+    );
+    const bodyLines = wrapSvgText(
+        'This certifies that the trainee manager has completed the full operational practice journey, cleared all available levels, and demonstrated the ability to interpret evidence, filter noise, and support business decisions with data.',
+        92
+    );
+    const scoreRuleLines = wrapSvgText(scoreRule, 108);
+
+    const scoreCards = [
+        { label: 'Levels Cleared', value: String(totalLevels) },
+        { label: 'Final Score', value: String(finalScore) },
+        { label: 'Maximum Score', value: String(totalLevels * 50) },
+        { label: 'Total Attempts', value: String(totalAttempts) },
+    ];
+
+    const scoreCardWidth = 278;
+    const scoreCardGap = 18;
+    const scoreCardX = 104;
+    const scoreCardY = 520;
+
+    const scoreCardsSvg = scoreCards.map((card, index) => {
+        const x = scoreCardX + (index * (scoreCardWidth + scoreCardGap));
+        return `
+            <rect x="${x}" y="${scoreCardY}" width="${scoreCardWidth}" height="118" rx="20" class="score-card-fill" />
+            <text x="${x + 24}" y="${scoreCardY + 36}" class="score-card-label">${escapeXml(card.label)}</text>
+            <text x="${x + 24}" y="${scoreCardY + 82}" class="score-card-value">${escapeXml(card.value)}</text>
+        `;
+    }).join('');
+
+    const breakdownRowsSvg = breakdown.map((item, index) => {
+        const rowY = breakdownStartY + 90 + (index * breakdownRowHeight);
+        const levelLabel = `Level ${item.level}: ${levelTitles[item.level] || ''}`;
+        return `
+            <rect x="96" y="${rowY - 32}" width="1208" height="46" rx="14" class="breakdown-row-fill" />
+            <text x="118" y="${rowY}" class="breakdown-strong">${escapeXml(levelLabel)}</text>
+            <text x="930" y="${rowY}" class="breakdown-meta">Attempts: ${escapeXml(String(item.attempts || 0))}</text>
+            <text x="1245" y="${rowY}" text-anchor="end" class="breakdown-meta">Score: ${escapeXml(String(item.score))}/50</text>
+        `;
+    }).join('');
+
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+            <defs>
+                <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#fffdf8" />
+                    <stop offset="100%" stop-color="#fff7ea" />
+                </linearGradient>
+                <style>
+                    .title { font: 700 50px Inter, 'Segoe UI', sans-serif; fill: #251c13; }
+                    .subtitle { font: 400 18px Inter, 'Segoe UI', sans-serif; fill: #6f6255; }
+                    .body { font: 400 20px Inter, 'Segoe UI', sans-serif; fill: #2f2418; }
+                    .kicker { font: 700 13px Inter, 'Segoe UI', sans-serif; fill: #ab4d13; text-transform: uppercase; letter-spacing: 0.04em; }
+                    .section-title { font: 700 20px Inter, 'Segoe UI', sans-serif; fill: #251c13; }
+                    .meta { font: 400 14px Inter, 'Segoe UI', sans-serif; fill: #6f6255; }
+                    .score-card-label { font: 700 14px Inter, 'Segoe UI', sans-serif; fill: #6f6255; }
+                    .score-card-value { font: 700 30px Inter, 'Segoe UI', sans-serif; fill: #251c13; }
+                    .breakdown-strong { font: 700 15px Inter, 'Segoe UI', sans-serif; fill: #2f2418; }
+                    .breakdown-meta { font: 400 15px Inter, 'Segoe UI', sans-serif; fill: #6f6255; }
+                    .score-card-fill { fill: rgba(255,255,255,0.92); stroke: rgba(99,86,71,0.12); }
+                    .breakdown-fill { fill: rgba(255,255,255,0.76); stroke: rgba(99,86,71,0.12); }
+                    .breakdown-row-fill { fill: rgba(255,248,239,0.92); }
+                </style>
+            </defs>
+            <rect width="${width}" height="${height}" rx="32" fill="url(#bgGrad)" stroke="rgba(99,86,71,0.16)" />
+            <circle cx="1230" cy="140" r="180" fill="#f3c15d" opacity="0.18" />
+            <circle cx="120" cy="${height - 110}" r="150" fill="#7dbb95" opacity="0.18" />
+
+            <rect x="56" y="56" width="${width - 112}" height="${height - 112}" rx="24" fill="rgba(255,255,255,0.62)" stroke="rgba(217,107,39,0.24)" stroke-width="2" />
+            <rect x="96" y="96" width="186" height="34" rx="17" fill="rgba(217,107,39,0.12)" />
+            <text x="116" y="118" class="kicker">Completion Certificate</text>
+
+            <text x="96" y="190" class="title">From Gut to Data Completion Certificate</text>
+            ${renderSvgTextLines(subtitleLines, 96, 228, 30, 'subtitle')}
+
+            <line x1="96" y1="322" x2="1304" y2="322" stroke="rgba(99,86,71,0.16)" />
+            <line x1="96" y1="464" x2="1304" y2="464" stroke="rgba(99,86,71,0.16)" />
+            ${renderSvgTextLines(bodyLines, 96, 370, 32, 'body')}
+
+            ${scoreCardsSvg}
+
+            <rect x="96" y="${breakdownStartY}" width="1208" height="${breakdownHeight}" rx="20" class="breakdown-fill" />
+            <text x="118" y="${breakdownStartY + 34}" class="section-title">Performance Breakdown</text>
+            ${renderSvgTextLines(scoreRuleLines, 118, breakdownStartY + 64, 24, 'meta')}
+            ${breakdownRowsSvg}
+
+            <text x="96" y="${height - 84}" class="meta">Issued on ${escapeXml(issuedAt)}</text>
+            <text x="700" y="${height - 84}" text-anchor="middle" class="meta">Product: From Gut to Data (Supermarket Edition)</text>
+            <text x="1304" y="${height - 84}" text-anchor="end" class="meta">Institution mark placeholder</text>
         </svg>
     `;
+}
 
+document.getElementById('save-certificate-btn').addEventListener('click', async function () {
+    const status = document.getElementById('save-status');
+    status.textContent = 'Generating PNG...';
+
+    const svg = buildCertificateSvg();
     const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const image = new Image();
 
     image.onload = function () {
         const canvas = document.createElement('canvas');
-        canvas.width = Math.ceil(rect.width * 2);
-        canvas.height = Math.ceil(rect.height * 2);
+        canvas.width = image.width * 2;
+        canvas.height = image.height * 2;
         const context = canvas.getContext('2d');
+
+        if (!context) {
+            URL.revokeObjectURL(url);
+            status.textContent = 'PNG export failed in this browser session. Please try again.';
+            return;
+        }
+
         context.setTransform(2, 0, 0, 2, 0, 0);
         context.drawImage(image, 0, 0);
         URL.revokeObjectURL(url);
 
         const link = document.createElement('a');
-        link.download = 'internship-manager-certificate.png';
+        link.download = 'from-gut-to-data-certificate.png';
         link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
         link.click();
+        link.remove();
         status.textContent = 'Certificate downloaded as PNG.';
     };
 
     image.onerror = function () {
         URL.revokeObjectURL(url);
-        status.textContent = 'PNG export failed in this browser session. Please try again or use a manual screenshot.';
+        status.textContent = 'PNG export failed in this browser session. Please try again.';
     };
 
     image.src = url;

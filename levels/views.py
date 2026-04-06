@@ -16,46 +16,42 @@ ATTEMPT_PENALTY = 15
 
 LEVEL_KNOWLEDGE_POINTS = {
     1: [
-        'Separating real business signals from short-term noise',
-        'Tracing clues back to their true source',
-        'Distinguishing temporary hype from stable demand',
-        'Combining external context with sales evidence',
+        'Not every loud signal reflects real demand.',
+        'Stable sales patterns matter more than single-day results.',
+        'A one-day spike does not define a long-term trend.',
     ],
     2: [
-        'Standardizing data formats and measurement units',
-        'Separating signal from noise in business data',
-        'Tracing data back to its real meaning',
-        'Judging the business logic behind the numbers',
+        'A number is meaningless without knowing its unit and definition.',
+        'Clean, comparable data is the foundation of any sound operational decision.',
+        'Standardization must come before judgment.',
     ],
     3: [
-        'Recognizing survivorship bias instead of trusting partial feedback',
-        'Standardizing data formats and measurement units',
-        'Separating signal from noise in business data',
-        'Comparing surface profit indicators with real profit outcome',
+        'High volume does not guarantee profit.',
+        'A large number is meaningless without its cost structure.',
+        'Sales growth does not equal profit growth.',
     ],
     4: [
-        'Recognizing visual misdirection from a mismatched chart baseline',
-        'Comparing charts with raw source data for accuracy',
-        'Recognizing survivorship bias instead of trusting partial summaries',
-        'Standardizing data formats and measurement units',
+        'Spotting visual tricks from a zoomed-in chart baseline',
+        'Fact-checking the graph against the cold hard numbers',
+        'Ignoring the hype to find the real profit story',
+        'Cleaning up messy units for a clear comparison',
     ],
     5: [
-        "Recognizing Simpson's paradox and separating overall conclusions from subgroup conclusions",
-        'Matching data analysis to the real business scenario',
-        'Recognizing visual misdirection from mismatched presentation choices',
-        'Recognizing survivorship bias instead of trusting partial signals',
+        'Always evaluate metrics within the context of your business structure - not in isolation.',
+        "Overall results can be misleading: patterns at the aggregate level may reverse when broken down by category (Simpson's Paradox).",
+        'The best decision comes from aligning performance with where value is generated.',
     ],
     6: [
-        'Judging whether a data sample is representative and avoiding bias from partial samples',
-        'Balancing cost and benefit when making operating decisions',
-        "Recognizing Simpson's paradox and separating overall conclusions from subgroup conclusions",
-        'Recognizing visual misdirection from mismatched chart baselines',
+        'Always check if your data represents the whole group.',
+        'Watch out for loud but unrepresentative voices.',
+        'Use structured sampling (stratified pilot) to uncover true patterns.',
+        'Let evidence - not emotion - guide your decisions.',
     ],
     7: [
-        'Cleaning duplicate records to keep business data accurate',
-        'Standardizing cross-platform data formats and measurement units',
-        'Combining cost and revenue to calculate the real operating result',
-        'Judging whether a sample is representative instead of trusting biased signals',
+        'Scrubbing ghost orders to keep our records clean',
+        'Syncing cross-platform data into one clear language',
+        'Fact-checking the bottom line by matching costs to revenue',
+        'Spotting biased signals to find the real story behind the noise',
     ],
 }
 
@@ -168,7 +164,7 @@ def submit_decision_api(request, level_order):
         return JsonResponse(
             {
                 'success': False,
-                'message': 'Order failed. You placed the order before checking the inventory and sales data or standardizing the units, so the store made an unnecessary egg purchase.',
+                'message': "Not quite! You jumped the gun and followed the manager's gut feeling before checking the math. It turns out that 100 in the system was not 100 eggs - it was 100 cartons. Next time, always clean up the units before you pull the trigger.",
                 'score': 0,
                 'awarded_score': 0,
                 'attempt_count': safe_attempt_count,
@@ -186,7 +182,7 @@ def submit_decision_api(request, level_order):
         return JsonResponse(
             {
                 'success': False,
-                'message': 'Decision failed. You chose to continue the promotion before checking the full campaign data, so you were misled by positive reviews and headline sales growth while the category was actually losing money.',
+                'message': 'Tough break. You got caught up in the hype before checking the full profit-and-loss view. The glowing reviews and higher sales did not mean the promo was healthy for the business.',
                 'score': 0,
                 'awarded_score': 0,
                 'attempt_count': safe_attempt_count,
@@ -204,7 +200,7 @@ def submit_decision_api(request, level_order):
         return JsonResponse(
             {
                 'success': False,
-                'message': 'Decision failed. You doubled the marketing budget before checking the raw revenue data and the misleading chart baseline, so you reacted to a visual illusion instead of the real growth rate.',
+                'message': 'Tough break. The chart got the best of you. You reacted to the visual jump before checking the baseline and the raw numbers behind it.',
                 'score': 0,
                 'awarded_score': 0,
                 'attempt_count': safe_attempt_count,
@@ -222,7 +218,7 @@ def submit_decision_api(request, level_order):
         return JsonResponse(
             {
                 'success': False,
-                'message': 'Decision failed. You chose Supplier A before checking the detailed category margins and the store category mix, so you were misled by the higher overall profit figure.',
+                'message': 'Ouch - you got caught in the average trap. The headline total looked better, but you skipped the category mix that actually drives this store.',
                 'score': 0,
                 'awarded_score': 0,
                 'attempt_count': safe_attempt_count,
@@ -240,7 +236,7 @@ def submit_decision_api(request, level_order):
         return JsonResponse(
             {
                 'success': False,
-                'message': 'Decision failed. You extended operating hours before checking whether the complaint sample represented real customer flow, so you reacted to a biased signal instead of the full store data.',
+                'message': 'Not quite. You acted on a loud, self-selected set of complaints before testing whether the late-night demand was really there.',
                 'score': 0,
                 'awarded_score': 0,
                 'attempt_count': safe_attempt_count,

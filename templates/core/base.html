@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Data Literacy Game{% endblock %}</title>
+    <title>{% block title %}From Gut to Data (Supermarket Edition){% endblock %}</title>
     <style>
         :root {
             --bg: #f4efe6;
@@ -211,7 +211,7 @@
     <div class="topbar">
         <a class="brand-link" href="/">
             <span class="brand-mark"></span>
-            <span>Supermarket Manager Internship</span>
+            <span>From Gut to Data (Supermarket Edition)</span>
         </a>
         <div class="topbar-center">
             {% if topbar_progress %}
@@ -226,7 +226,7 @@
             {% endif %}
         </div>
         <div class="topbar-actions">
-            <button id="open-help-btn" class="ghost-btn" type="button">Settings / Help</button>
+            <button id="restart-game-btn" class="ghost-btn" type="button">Restart Game</button>
         </div>
     </div>
 
@@ -263,7 +263,7 @@
     <script>
     (function () {
         const helpModal = document.getElementById('help-modal');
-        const openHelpBtn = document.getElementById('open-help-btn');
+        const restartGameBtn = document.getElementById('restart-game-btn');
         const closeHelpBtn = document.getElementById('close-help-btn');
         const replayTutorialBtn = document.getElementById('replay-tutorial-btn');
 
@@ -271,8 +271,9 @@
             helpModal.classList.add('hidden');
         }
 
-        openHelpBtn.addEventListener('click', () => {
-            helpModal.classList.remove('hidden');
+        restartGameBtn.addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = '/';
         });
 
         closeHelpBtn.addEventListener('click', closeHelp);

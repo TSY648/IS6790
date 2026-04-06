@@ -164,6 +164,28 @@
         font-size: 15px;
     }
 
+    .axis-fixer-card {
+        margin-top: 16px;
+        padding: 16px;
+        border: 1px solid #dbe4ef;
+        border-radius: 14px;
+        background: #f8fbff;
+    }
+
+    .axis-fixer-card img {
+        display: block;
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        background: white;
+    }
+
+    .axis-fixer-note {
+        margin: 10px 0 0;
+        color: #2563eb;
+        font-weight: 600;
+    }
+
     .tutorial-overlay {
         position: fixed;
         inset: 0;
@@ -315,7 +337,7 @@
     </main>
 
     <aside class="panel right-panel">
-        <h3 id="info-sources-title">Information Sources</h3>
+        <h3 id="info-sources-title">Data/Information Entries</h3>
 
         <div id="category-npc" class="category-block">
             <div id="category-npc-title" class="category-title">Colleagues</div>
@@ -362,10 +384,10 @@
             <img class="entry-title-avatar" src="/static/levels/shared/store-manager-avatar.png" alt="Store Manager avatar">
             <span id="entry-title-text">Store Manager</span>
         </h3>
-        <p id="entry-text">Yesterday demand exploded. We should double the order quantity right now and move fast.</p>
+        <p id="entry-text">Strawberries flew off the shelves yesterday and we were close to a stockout. I do not want a repeat of that, so I am leaning towards increasing this week's order.</p>
         <div class="entry-actions">
-            <button id="accept-suggestion-btn" class="primary-action" type="button">Accept Suggestion and Order Now</button>
-            <button id="investigate-first-btn" class="secondary-action" type="button">I Want to Look Into the Cause First</button>
+            <button id="accept-suggestion-btn" class="primary-action" type="button">Yes! I'll Place the Order Immediately</button>
+            <button id="investigate-first-btn" class="secondary-action" type="button">Hmm, Let Me Check the Reports First.</button>
         </div>
     </div>
 </div>
@@ -385,6 +407,7 @@ let levelFivePath = null;
 let levelSixPath = null;
 let levelSevenProcessingComplete = false;
 let levelSevenRows = [];
+const levelSevenStateKey = 'level_7_processing_state';
 let stagedInvestigationUnlocked = false;
 const viewedKeyItems = new Set();
 
@@ -407,6 +430,9 @@ const acceptSuggestionBtn = document.getElementById('accept-suggestion-btn');
 const investigateFirstBtn = document.getElementById('investigate-first-btn');
 const objectiveHeading = document.getElementById('objective-heading');
 const infoSourcesTitle = document.getElementById('info-sources-title');
+const categoryNpcBlock = document.getElementById('category-npc');
+const categoryReportBlock = document.getElementById('category-report');
+const categoryExternalBlock = document.getElementById('category-external');
 const categoryNpcTitle = document.getElementById('category-npc-title');
 const categoryReportTitle = document.getElementById('category-report-title');
 const categoryExternalTitle = document.getElementById('category-external-title');
@@ -415,17 +441,17 @@ const resultTitle = document.getElementById('result-title');
 const tutorialSteps = [
     {
         title: 'Colleagues Panel',
-        text: 'Your colleagues give you people-based clues. Their comments can help you spot pressure, assumptions, and early hints, but you still need evidence before you decide.',
+        text: 'Check in with your teammates! They\'ll give you the inside scoop on what\'s happening on the floor. While their hints can help you spot trends or hidden pressures, always double-check the facts before you make your move.',
         targetId: 'category-npc',
     },
     {
         title: 'Reports Panel',
-        text: 'Reports hold the structured evidence. Use them to verify what is really happening before you trust anyone\'s intuition.',
+        text: 'Time to look under the hood. Reports give you the hard evidence you need to back up your choices. Before you trust a \'hunch\' or a hallway tip, verify it here first.',
         targetId: 'category-report',
     },
     {
         title: 'External Info Panel',
-        text: 'External information explains surrounding conditions such as weather and social buzz. These signals help you judge whether a spike is sustainable or temporary.',
+        text: 'Don\'t get tunnel vision. Use this panel to track the world around you like the forecast and trending topics. It\'s the best way to tell if a sales jump is a sustainable trend or just a one-day wonder.',
         targetId: 'category-external',
     },
 ];
@@ -463,6 +489,9 @@ function renderItemContent(item) {
 
     if (item.content_type === 'table') {
         html += `<p>${item.content_text}</p>`;
+        if (item.content_json.table_title) {
+            html += `<p style="margin:16px 0 8px; font-weight:700; color:#111827;">${item.content_json.table_title}</p>`;
+        }
         if (item.content_json.headers && item.content_json.rows) {
             html += '<table border="1" cellpadding="8" cellspacing="0">';
             html += '<tr>';
@@ -481,6 +510,27 @@ function renderItemContent(item) {
                 html += '</tr>';
             });
             html += '</table>';
+        }
+        if (item.content_json.footer_lines && item.content_json.footer_lines.length) {
+            html += '<div style="margin-top:16px;">';
+            item.content_json.footer_lines.forEach((line) => {
+                html += `<p style="margin:8px 0 0; color:#374151;">${line}</p>`;
+            });
+            html += '</div>';
+        }
+        if (item.content_json.axis_fixer) {
+            const axisFixer = item.content_json.axis_fixer;
+            html += `
+                <div class="axis-fixer-card">
+                    <img
+                        id="axis-fixer-image"
+                        src="${axisFixer.before_src}"
+                        alt="${axisFixer.before_alt || item.title}"
+                    >
+                    <button id="axis-fixer-btn" class="primary-action" type="button">${axisFixer.button_label}</button>
+                    <p id="axis-fixer-note" class="axis-fixer-note" style="display:none;"></p>
+                </div>
+            `;
         }
         if (item.content_json.src) {
             const imageAlt = item.content_json.alt || item.title;
@@ -522,6 +572,31 @@ function renderItemContent(item) {
     }
 
     canvasArea.innerHTML = html;
+
+    if (item.content_json.axis_fixer) {
+        const axisFixer = item.content_json.axis_fixer;
+        const axisFixerBtn = document.getElementById('axis-fixer-btn');
+        const axisFixerImage = document.getElementById('axis-fixer-image');
+        const axisFixerNote = document.getElementById('axis-fixer-note');
+
+        if (axisFixerBtn && axisFixerImage && axisFixerNote) {
+            let isFullScaleVisible = false;
+            axisFixerBtn.addEventListener('click', () => {
+                isFullScaleVisible = !isFullScaleVisible;
+                axisFixerImage.src = isFullScaleVisible ? axisFixer.after_src : axisFixer.before_src;
+                axisFixerImage.alt = isFullScaleVisible
+                    ? (axisFixer.after_alt || axisFixerImage.alt)
+                    : (axisFixer.before_alt || axisFixerImage.alt);
+                axisFixerBtn.textContent = isFullScaleVisible
+                    ? (axisFixer.reset_label || 'Back to Distorted View')
+                    : (axisFixer.button_label || 'Show Full Scale (Start at $0)');
+                axisFixerNote.textContent = isFullScaleVisible
+                    ? (axisFixer.success_text || '')
+                    : (axisFixer.reset_text || '');
+                axisFixerNote.style.display = 'block';
+            });
+        }
+    }
 }
 
 function renderDecisionPanel() {
@@ -544,7 +619,7 @@ function renderDecisionPanel() {
 
     html += `
         </div>
-        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
+        <button id="confirm-submit-btn" class="primary-action" type="button">${levelOrder === 1 ? 'Place Order' : 'Submit Decision'}</button>
     `;
 
     canvasArea.innerHTML = html;
@@ -625,66 +700,66 @@ function buildKnowledgePointsHtml(points) {
         return '';
     }
 
-    const items = points.map((point, index) => `
-        <label style="display:flex; gap:8px; align-items:flex-start; margin-top:8px; color:#374151;">
-            <input type="checkbox" class="knowledge-check" value="${index}" style="margin-top:3px;">
-            <span>${point}</span>
-        </label>
+    const items = points.map((point) => `
+        <li style="margin-top:8px; color:#374151;">${point}</li>
     `).join('');
 
     return `
         <div>
-            <strong>Knowledge Review Checklist</strong>
-            <p style="margin:8px 0 0; color:#4b5563;">Check all knowledge points used in this level to continue.</p>
-            <div style="margin-top:8px;">${items}</div>
+            <strong>What You Learned</strong>
+            <ul style="margin:8px 0 0 18px; padding:0;">${items}</ul>
         </div>
     `;
 }
 
 function initializeKnowledgeChecklistGate() {
-    const checks = Array.from(resultKnowledge.querySelectorAll('.knowledge-check'));
-    if (!checks.length) {
-        resultActionBtn.disabled = false;
-        return;
-    }
-
-    const sync = () => {
-        resultActionBtn.disabled = !checks.some((check) => check.checked);
-    };
-
-    checks.forEach((check) => {
-        check.addEventListener('change', sync);
-    });
-
-    sync();
+    resultActionBtn.disabled = false;
 }
 
 function applyLevelSpecificUiCopy() {
-    if ([3, 4, 5, 6, 7].includes(levelOrder)) {
-        objectiveHeading.textContent = 'Level Objective';
-        infoSourcesTitle.textContent = 'Information Sources';
+    if (levelOrder === 4) {
+        objectiveHeading.textContent = 'Mission Objective';
+        infoSourcesTitle.textContent = 'Data/Information Entries';
         categoryNpcTitle.textContent = 'Supermarket Staff';
         categoryReportTitle.textContent = 'Reports';
         categoryExternalTitle.textContent = 'External Information';
         resultTitle.textContent = 'Decision Result';
+        decisionBtn.textContent = 'Submit Decision';
+        return;
+    }
+
+    if ([3, 4, 5, 6, 7].includes(levelOrder)) {
+        objectiveHeading.textContent = 'Mission Objective';
+        infoSourcesTitle.textContent = 'Data/Information Entries';
+        categoryNpcTitle.textContent = 'Supermarket Staff';
+        categoryReportTitle.textContent = 'Reports';
+        categoryExternalTitle.textContent = 'External Information';
+        resultTitle.textContent = 'Decision Result';
+        decisionBtn.textContent = 'Submit Decision';
         if (levelOrder === 7) {
-            document.getElementById('level-desc').textContent = 'Standardize raw takeout order data from Platform A and Platform B, remove duplicate records, unify counting units, and reconcile the real profit or loss of the takeout business.';
+            document.getElementById('level-desc').textContent = 'It is time for a deep clean. High volume does not always mean high profit, especially when the data is double-counted and the units are mismatched. Your goal is to standardize the chaos, strip out the noise, and find the actual bottom line.';
         }
         return;
     }
 
     if (levelOrder === 2) {
+        objectiveHeading.textContent = 'Mission Objective';
+        infoSourcesTitle.textContent = 'Data/Information Entries';
         categoryNpcTitle.textContent = 'Supermarket Staff';
+        categoryReportTitle.textContent = 'Reports';
+        categoryExternalTitle.textContent = 'External Information';
         resultTitle.textContent = 'Decision Result';
+        decisionBtn.textContent = 'Submit Decision';
         return;
     }
 
     objectiveHeading.textContent = 'Mission Objective';
-    infoSourcesTitle.textContent = 'Information Sources';
-    categoryNpcTitle.textContent = 'Supermarket Staff';
+    infoSourcesTitle.textContent = 'Data/Information Entries';
+    categoryNpcTitle.textContent = 'Colleagues';
     categoryReportTitle.textContent = 'Reports';
     categoryExternalTitle.textContent = 'External Info';
     resultTitle.textContent = 'Result';
+    decisionBtn.textContent = 'Place Order';
 }
 
 async function submitDecision() {
@@ -727,6 +802,9 @@ async function submitDecision() {
         resultScore.textContent = buildResultScoreText(data);
 
         if (data.success) {
+            if (levelOrder === 7) {
+                clearLevelSevenState();
+            }
             resultKnowledge.innerHTML = buildKnowledgePointsHtml(data.knowledge_points || []);
             resultActionBtn.textContent = data.action_label || 'Continue';
             saveLevelScore(data.awarded_score || 0);
@@ -790,8 +868,8 @@ function createItemButton(item) {
         `;
     } else if (levelOrder === 1 && item.title === 'Ms. Zhang') {
         btn.innerHTML = `
-            <img class="manager-avatar" src="/static/levels/shared/cashier-avatar.png" alt="Cashier avatar">
-            <span class="item-btn-label">Cashier</span>
+            <img class="manager-avatar" src="/static/levels/shared/cashier-avatar.png" alt="Ms. Zhang avatar">
+            <span class="item-btn-label">${item.title}</span>
         `;
     } else {
         btn.innerHTML = `<span class="item-btn-label">${item.title}</span>`;
@@ -819,64 +897,79 @@ function createItemButton(item) {
     return btn;
 }
 
+function updateCategoryVisibility() {
+    const categoryBlocks = [
+        { block: categoryNpcBlock, group: document.getElementById('group-npc') },
+        { block: categoryReportBlock, group: document.getElementById('group-report') },
+        { block: categoryExternalBlock, group: document.getElementById('group-external') },
+    ];
+
+    categoryBlocks.forEach(({ block, group }) => {
+        if (!block || !group) {
+            return;
+        }
+
+        block.style.display = group.childElementCount > 0 ? '' : 'none';
+    });
+}
+
 function updateEntryCopy() {
     acceptSuggestionBtn.style.display = '';
     investigateFirstBtn.style.gridColumn = '';
 
     if (levelOrder === 2) {
         entryTitleText.textContent = 'Store Manager';
-        entryText.textContent = 'The system shows egg inventory at only 100. I recommend ordering 50 cartons right now. Do you want to order immediately or inspect the sales and inventory data first?';
-        acceptSuggestionBtn.textContent = 'Accept Suggestion and Order';
-        investigateFirstBtn.textContent = 'I Want to Check Inventory and Sales First';
+        entryText.textContent = 'I am seeing a red flag on the inventory dashboard. Eggs are showing 100 on hand. If that number is right, we are in danger of a stockout and our regulars will not like it. Eggs are the literal bread and butter of this place. My instinct is to place a 50-carton top-up right now to protect availability.';
+        acceptSuggestionBtn.textContent = "Trust the Boss' Instinct. Place the Order Now.";
+        investigateFirstBtn.textContent = 'Wait! Let Me Check the Sales and Inventory Numbers First.';
         return;
     }
 
     if (levelOrder === 3) {
         entryTitleText.textContent = 'Store Manager';
-        entryText.textContent = 'The promotion drew strong reviews and sales growth over the weekend. I suggest we continue the same buy-one-get-one campaign immediately. Do you want to continue now or inspect the full promotion data first?';
-        acceptSuggestionBtn.textContent = 'Accept Suggestion and Continue Promotion';
-        investigateFirstBtn.textContent = 'I Want to Review the Full Promotion Data';
+        entryText.textContent = 'Weekend sales volume was up 40% with the BOGO. Customer feedback is loud. I am tempted to roll it into next week to keep traffic up, but I am on the hook for margin. Can you check the full P&L (gross profit and labour/freebie costs) before I sign off today?';
+        acceptSuggestionBtn.textContent = "Greenlight It! Let's Keep the Customers Happy.";
+        investigateFirstBtn.textContent = 'Hold On! I Want to See the Full Profit and Loss Report First.';
         return;
     }
 
     if (levelOrder === 4) {
         entryTitleText.textContent = 'Store Manager';
-        entryText.textContent = "This month's revenue chart looks like a huge jump. I recommend doubling next month's marketing budget immediately. Do you want to expand the budget now or inspect the raw revenue data and chart first?";
-        acceptSuggestionBtn.textContent = 'Accept Suggestion and Double Budget';
-        investigateFirstBtn.textContent = 'I Want to Check the Raw Revenue Data First';
+        entryText.textContent = 'Revenue is up and I am glad to see it. It seems like the marketing campaign is working. I want to double it for next month.';
+        acceptSuggestionBtn.textContent = "That's Great! Let's Double the Budget!";
+        investigateFirstBtn.textContent = 'Wait! Let Me Look at the Data Behind That Graph First.';
         return;
     }
 
     if (levelOrder === 5) {
         entryTitleText.textContent = 'Store Manager';
-        entryText.textContent = 'Supplier A shows a higher overall margin than Supplier B. I recommend choosing Supplier A immediately. Do you want to choose now or verify the detailed category data for both suppliers first?';
-        acceptSuggestionBtn.textContent = 'Accept Suggestion and Choose Supplier A';
-        investigateFirstBtn.textContent = 'I Want to Verify Both Suppliers in Detail';
+        entryText.textContent = 'Procurement needs our decision today. The summary shows Supplier A at 15% overall margin versus Supplier B at 12%, which sounds decisive. Shall we go ahead and sign with Supplier A?';
+        acceptSuggestionBtn.textContent = 'Go with the Higher Margin. Sign Supplier A.';
+        investigateFirstBtn.textContent = 'Wait! I Need to See How They Perform in Our Top-Selling Categories First.';
         return;
     }
 
     if (levelOrder === 6) {
         entryTitleText.textContent = 'Store Manager';
-        entryText.textContent = 'We have received several late-night complaints saying the store closes too early. I recommend extending business hours from 10 PM to midnight immediately. Do you want to extend now or inspect the full customer-flow data first?';
-        acceptSuggestionBtn.textContent = 'Accept Suggestion and Extend Hours';
-        investigateFirstBtn.textContent = 'I Want to Review Full Customer-Flow Data';
+        entryText.textContent = 'The inbox is blowing up with people saying we close too early. I want to push closing time to midnight starting tomorrow.';
+        acceptSuggestionBtn.textContent = "Sure - Let's Switch to Midnight Immediately.";
+        investigateFirstBtn.textContent = "Let's Run a 2-Week Pilot and Measure It Properly First.";
         return;
     }
 
     if (levelOrder === 7) {
         entryTitleText.textContent = 'Store Manager';
-        entryText.textContent = 'The takeout records from Platform A and Platform B are messy, and finance cannot reconcile the real result. Please clean the order data, remove duplicates, unify the units, and tell me whether the channel is profitable or loss-making.';
-        acceptSuggestionBtn.style.display = 'none';
-        investigateFirstBtn.style.gridColumn = '1 / -1';
-        investigateFirstBtn.textContent = 'Start Reconciliation Work';
+        entryText.textContent = 'The delivery tablets have not stopped buzzing all day. Orders are orders, right? Finance is complaining that the spreadsheets do not match, but I say we just keep the momentum going.';
+        acceptSuggestionBtn.textContent = "The Volume Looks Great. Let's Keep It Running!";
+        investigateFirstBtn.textContent = 'Wait! Let Me Take a Look at the Order Data.';
         return;
     }
 
     const managerItem = levelConfig.items.find((item) => item.item_code === 'npc_manager');
     entryTitleText.textContent = managerItem ? managerItem.title : 'Store Manager';
-    entryText.textContent = managerItem ? managerItem.content_text : 'Yesterday demand exploded. We should double the order quantity right now and move fast.';
-    acceptSuggestionBtn.textContent = 'Accept Suggestion and Order Now';
-    investigateFirstBtn.textContent = 'I Want to Look Into the Cause First';
+    entryText.textContent = managerItem ? managerItem.content_text : 'Strawberries flew off the shelves yesterday and we were close to a stockout. I do not want a repeat of that, so I am leaning towards increasing this week\'s order.';
+    acceptSuggestionBtn.textContent = 'Yes! I\'ll Place the Order Immediately';
+    investigateFirstBtn.textContent = 'Hmm, Let Me Check the Reports First.';
 }
 
 function showEntryPrompt() {
@@ -907,7 +1000,7 @@ function syncStagedDecisionState() {
     const ready = stagedInvestigationUnlocked && processingReady && viewedKeyItems.size >= totalKeyItems;
     decisionBtn.disabled = !ready;
     if (ready) {
-        decisionBtn.textContent = 'Submit Decision';
+        decisionBtn.textContent = levelOrder === 1 ? 'Place Order' : 'Submit Decision';
     } else if (levelOrder === 7 && !levelSevenProcessingComplete) {
         decisionBtn.textContent = 'Complete Data Processing First';
     } else {
@@ -919,34 +1012,288 @@ function getLevelSevenRawItem() {
     return levelConfig.items.find((item) => item.item_code === 'takeout_raw');
 }
 
+function saveLevelSevenState() {
+    if (levelOrder !== 7) {
+        return;
+    }
+
+    localStorage.setItem(levelSevenStateKey, JSON.stringify({
+        rows: levelSevenRows,
+        stagedInvestigationUnlocked,
+    }));
+}
+
+function loadLevelSevenState() {
+    if (levelOrder !== 7) {
+        return null;
+    }
+
+    try {
+        const rawState = localStorage.getItem(levelSevenStateKey);
+        if (!rawState) {
+            return null;
+        }
+
+        const parsedState = JSON.parse(rawState);
+        if (!parsedState || !Array.isArray(parsedState.rows)) {
+            return null;
+        }
+
+        return parsedState;
+    } catch (error) {
+        return null;
+    }
+}
+
+function clearLevelSevenState() {
+    localStorage.removeItem(levelSevenStateKey);
+}
+
 function getLevelSevenPlatformLabel(platform) {
     if (platform === 'Meituan') {
-        return 'Platform A';
+        return 'Delivery app A';
     }
     if (platform === 'Ele.me') {
-        return 'Platform B';
+        return 'Delivery app B';
     }
     return platform;
 }
 
-function initializeLevelSevenRows() {
-    const rawItem = getLevelSevenRawItem();
-    if (!rawItem || !rawItem.content_json || !rawItem.content_json.rows) {
-        levelSevenRows = [];
-        return;
+function normalizeLevelSevenUnit(unit) {
+    const normalized = String(unit || '').trim().toLowerCase();
+    if (['piece', 'pieces', 'pcs', 'pc'].includes(normalized)) {
+        return 'Piece';
+    }
+    if (['portion', 'portions'].includes(normalized)) {
+        return 'Portion';
+    }
+    if (['dozen', 'doz'].includes(normalized)) {
+        return 'Dozen';
+    }
+    if (normalized === 'kg') {
+        return 'kg';
+    }
+    if (normalized === 'g') {
+        return 'g';
+    }
+    return unit;
+}
+
+function parseLevelSevenNumber(value) {
+    const parsed = Number(String(value).replace(/[^0-9.-]/g, ''));
+    return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function parseLevelSevenCurrency(value) {
+    return parseLevelSevenNumber(value);
+}
+
+function formatLevelSevenQuantity(value) {
+    if (Number.isInteger(value)) {
+        return String(value);
     }
 
-    levelSevenRows = rawItem.content_json.rows.map((row, index) => ({
+    return value.toFixed(3).replace(/\.?0+$/, '');
+}
+
+function formatLevelSevenCurrency(value) {
+    const precision = Math.abs(value) < 0.1 ? 3 : 2;
+    return `$${value.toFixed(precision)}`;
+}
+
+function getLevelSevenItemKey(item) {
+    const normalized = String(item || '').toLowerCase();
+    if (normalized.includes('strawberr')) {
+        return 'strawberries';
+    }
+    if (normalized.includes('wing')) {
+        return 'wings';
+    }
+    if (normalized.includes('egg')) {
+        return 'eggs';
+    }
+    return 'generic';
+}
+
+function getLevelSevenNormalizedItemName(item) {
+    const itemKey = getLevelSevenItemKey(item);
+    if (itemKey === 'eggs') {
+        return 'Eggs';
+    }
+    if (itemKey === 'wings') {
+        return 'Chicken wings';
+    }
+    if (itemKey === 'strawberries') {
+        return 'Strawberries';
+    }
+    return item;
+}
+
+function getLevelSevenTargetUnit(itemKey) {
+    if (itemKey === 'wings') {
+        return 'Portion';
+    }
+    if (itemKey === 'strawberries') {
+        return 'kg';
+    }
+    return 'Piece';
+}
+
+function getLevelSevenUnitOptions(itemKey) {
+    if (itemKey === 'wings') {
+        return ['Portion', 'Piece'];
+    }
+    if (itemKey === 'strawberries') {
+        return ['kg', 'g'];
+    }
+    return ['Piece', 'Dozen'];
+}
+
+function convertLevelSevenRowToBase(itemKey, quantity, unit, unitPrice) {
+    if (itemKey === 'wings') {
+        if (unit === 'Portion') {
+            return {
+                quantity: quantity * 2,
+                unitPrice: unitPrice / 2,
+            };
+        }
+        return {
+            quantity,
+            unitPrice,
+        };
+    }
+
+    if (itemKey === 'strawberries') {
+        if (unit === 'kg') {
+            return {
+                quantity: quantity * 1000,
+                unitPrice: unitPrice / 1000,
+            };
+        }
+        return {
+            quantity,
+            unitPrice,
+        };
+    }
+
+    if (unit === 'Dozen') {
+        return {
+            quantity: quantity * 12,
+            unitPrice: unitPrice / 12,
+        };
+    }
+
+    return {
+        quantity,
+        unitPrice,
+    };
+}
+
+function convertLevelSevenBaseToTarget(itemKey, baseQuantity, baseUnitPrice, targetUnit) {
+    if (itemKey === 'wings') {
+        if (targetUnit === 'Portion') {
+            return {
+                quantity: baseQuantity / 2,
+                unitPrice: baseUnitPrice * 2,
+            };
+        }
+        return {
+            quantity: baseQuantity,
+            unitPrice: baseUnitPrice,
+        };
+    }
+
+    if (itemKey === 'strawberries') {
+        if (targetUnit === 'kg') {
+            return {
+                quantity: baseQuantity / 1000,
+                unitPrice: baseUnitPrice * 1000,
+            };
+        }
+        return {
+            quantity: baseQuantity,
+            unitPrice: baseUnitPrice,
+        };
+    }
+
+    if (targetUnit === 'Dozen') {
+        return {
+            quantity: baseQuantity / 12,
+            unitPrice: baseUnitPrice * 12,
+        };
+    }
+
+    return {
+        quantity: baseQuantity,
+        unitPrice: baseUnitPrice,
+    };
+}
+
+function getLevelSevenRowTotalRevenue(row) {
+    const quantity = parseLevelSevenNumber(row.quantity);
+    const unitPrice = parseLevelSevenCurrency(row.unitPrice);
+    return quantity * unitPrice;
+}
+
+function buildLevelSevenRevenueSortRows(rows) {
+    const totalsByItem = new Map();
+
+    rows.forEach((row) => {
+        const itemName = getLevelSevenNormalizedItemName(row.item);
+        const existing = totalsByItem.get(itemName) || { itemName, rowCount: 0, totalRevenue: 0 };
+        existing.rowCount += 1;
+        existing.totalRevenue += getLevelSevenRowTotalRevenue(row);
+        totalsByItem.set(itemName, existing);
+    });
+
+    return Array.from(totalsByItem.values())
+        .sort((left, right) => right.totalRevenue - left.totalRevenue)
+        .map((entry) => `
+            <tr>
+                <td>${entry.itemName}</td>
+                <td>${entry.rowCount}</td>
+                <td>${formatLevelSevenCurrency(entry.totalRevenue)}</td>
+            </tr>
+        `).join('');
+}
+
+function buildFreshLevelSevenRows() {
+    const rawItem = getLevelSevenRawItem();
+    if (!rawItem || !rawItem.content_json || !rawItem.content_json.rows) {
+        return [];
+    }
+
+    return rawItem.content_json.rows.map((row, index) => ({
         rowKey: index,
         platform: row[0],
         orderId: row[1],
-        item: row[2],
-        quantity: row[3],
-        unit: row[4],
-        revenue: row[5],
+        timestamp: row[2],
+        item: row[3],
+        quantity: row[4],
+        unit: normalizeLevelSevenUnit(row[5]),
+        unitPrice: row[6],
+        itemKey: getLevelSevenItemKey(row[3]),
         isDeleted: false,
         isDuplicate: index === rawItem.content_json.rows.length - 1,
     }));
+}
+
+function initializeLevelSevenRows() {
+    const savedState = loadLevelSevenState();
+    if (savedState && savedState.rows.length) {
+        levelSevenRows = savedState.rows.map((row, index) => ({
+            ...row,
+            rowKey: row.rowKey ?? index,
+            itemKey: row.itemKey || getLevelSevenItemKey(row.item),
+            unit: normalizeLevelSevenUnit(row.unit),
+            isDeleted: Boolean(row.isDeleted),
+            isDuplicate: Boolean(row.isDuplicate),
+        }));
+        stagedInvestigationUnlocked = Boolean(savedState.stagedInvestigationUnlocked);
+        return;
+    }
+
+    levelSevenRows = buildFreshLevelSevenRows();
 }
 
 function isLevelSevenProcessingReady() {
@@ -955,12 +1302,13 @@ function isLevelSevenProcessingReady() {
     }
 
     const duplicateRemoved = levelSevenRows.some((row) => row.isDuplicate && row.isDeleted);
-    const allUnitsNormalized = levelSevenRows.every((row) => row.isDeleted || row.unit === 'Piece');
+    const allUnitsNormalized = levelSevenRows.every((row) => row.isDeleted || row.unit === getLevelSevenTargetUnit(row.itemKey));
     return duplicateRemoved && allUnitsNormalized;
 }
 
 function updateLevelSevenProcessingState() {
     levelSevenProcessingComplete = isLevelSevenProcessingReady();
+    saveLevelSevenState();
     syncStagedDecisionState();
 }
 
@@ -970,20 +1318,22 @@ function renderLevelSevenProcessingDesk() {
     }
 
     const visibleRows = levelSevenRows.filter((row) => !row.isDeleted);
+    const revenueSortRows = buildLevelSevenRevenueSortRows(visibleRows);
     const rowsHtml = visibleRows.map((row) => `
         <tr>
             <td>${getLevelSevenPlatformLabel(row.platform)}</td>
             <td>${row.orderId}</td>
+            <td>${row.timestamp}</td>
             <td>${row.item}</td>
             <td>${row.quantity}</td>
             <td>
                 <select data-row-key="${row.rowKey}" class="level-seven-unit-select">
-                    <option value="Piece" ${row.unit === 'Piece' ? 'selected' : ''}>Piece</option>
-                    <option value="Portion" ${row.unit === 'Portion' ? 'selected' : ''}>Portion</option>
-                    <option value="Dozen" ${row.unit === 'Dozen' ? 'selected' : ''}>Dozen</option>
+                    ${getLevelSevenUnitOptions(row.itemKey).map((option) => `
+                        <option value="${option}" ${row.unit === option ? 'selected' : ''}>${option}</option>
+                    `).join('')}
                 </select>
             </td>
-            <td>${row.revenue}</td>
+            <td>${row.unitPrice}</td>
             <td><button type="button" class="primary-action level-seven-delete-btn" data-row-key="${row.rowKey}" style="margin-top:0; padding:8px 12px; background:#dc2626;">Delete Row</button></td>
         </tr>
     `).join('');
@@ -993,20 +1343,36 @@ function renderLevelSevenProcessingDesk() {
         : 'Complete the cleanup steps first to unlock the reconciliation decision.';
 
     canvasArea.innerHTML = `
-        <h3>Takeout Data Processing Desk</h3>
-        <p>Use the center workspace to clean the raw takeout data before you make the final reconciliation decision.</p>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+            <h3 style="margin:0;">Delivery Data Processing Desk</h3>
+            <button id="level-seven-restore-table-btn" class="secondary-action" type="button" style="margin-top:0;">Restore Table</button>
+        </div>
+        <p>Use the center workspace to clean the raw delivery data before you make the final reconciliation decision.</p>
         <table border="1" cellpadding="8" cellspacing="0">
             <tr>
                 <th>Platform</th>
                 <th>Order ID</th>
+                <th>Timestamp</th>
                 <th>Item</th>
-                <th>Quantity</th>
+                <th>Qty</th>
                 <th>Unit</th>
-                <th>Revenue</th>
+                <th>Unit Price</th>
                 <th>Action</th>
             </tr>
             ${rowsHtml}
         </table>
+        <div style="margin-top:24px;">
+            <h3>Revenue Sort Module</h3>
+            <p>Grouped from the currently visible rows. This sort updates after you delete duplicates or normalize units.</p>
+            <table border="1" cellpadding="8" cellspacing="0">
+                <tr>
+                    <th>Item</th>
+                    <th>Rows Counted</th>
+                    <th>Total Revenue</th>
+                </tr>
+                ${revenueSortRows}
+            </table>
+        </div>
         <p style="margin-top:16px;">${summaryText}</p>
     `;
 
@@ -1021,12 +1387,26 @@ function renderLevelSevenProcessingDesk() {
         });
     });
 
+    document.getElementById('level-seven-restore-table-btn').addEventListener('click', () => {
+        levelSevenRows = buildFreshLevelSevenRows();
+        updateLevelSevenProcessingState();
+        renderLevelSevenProcessingDesk();
+    });
+
     document.querySelectorAll('.level-seven-unit-select').forEach((select) => {
         select.addEventListener('change', () => {
             const row = levelSevenRows.find((entry) => String(entry.rowKey) === select.dataset.rowKey && !entry.isDeleted);
             if (row) {
+                const currentQuantity = parseLevelSevenNumber(row.quantity);
+                const currentUnitPrice = parseLevelSevenCurrency(row.unitPrice);
+                const base = convertLevelSevenRowToBase(row.itemKey, currentQuantity, row.unit, currentUnitPrice);
+                const converted = convertLevelSevenBaseToTarget(row.itemKey, base.quantity, base.unitPrice, select.value);
+
+                row.quantity = formatLevelSevenQuantity(converted.quantity);
                 row.unit = select.value;
+                row.unitPrice = formatLevelSevenCurrency(converted.unitPrice);
                 updateLevelSevenProcessingState();
+                renderLevelSevenProcessingDesk();
             }
         });
     });
@@ -1038,8 +1418,8 @@ function renderLevelTwoRushOrderPanel() {
         <p>The manager wants to place an immediate order for 50 cartons before you finish checking the data.</p>
         <div class="choice-box">
             <label>
-                <input type="radio" name="decision_value" value="Order" checked>
-                Submit an order for 50 cartons of eggs
+                <input type="radio" name="decision_value" value="Place Order" checked>
+                Place the order for 50 cartons of eggs
             </label>
         </div>
         <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
@@ -1055,7 +1435,7 @@ function renderLevelThreeRushPromotionPanel() {
         <div class="choice-box">
             <label>
                 <input type="radio" name="decision_value" value="Continue Promotion" checked>
-                Continue the same buy-one-get-one promotion
+                Continue the same BOGO promotion next week
             </label>
         </div>
         <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
@@ -1086,8 +1466,8 @@ function renderLevelFiveRushSupplierPanel() {
         <p>The manager wants to choose Supplier A before you finish checking the detailed supplier data and the store category structure.</p>
         <div class="choice-box">
             <label>
-                <input type="radio" name="decision_value" value="Choose Supplier A" checked>
-                Choose Supplier A immediately
+                <input type="radio" name="decision_value" value="Select Supplier A" checked>
+                Sign with Supplier A immediately
             </label>
         </div>
         <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
@@ -1099,11 +1479,27 @@ function renderLevelFiveRushSupplierPanel() {
 function renderLevelSixRushHoursPanel() {
     canvasArea.innerHTML = `
         <h3>Operating-Hours Submission</h3>
-        <p>The manager wants to extend the supermarket schedule before you finish checking whether the complaint sample represents real demand.</p>
+        <p>The manager wants to switch closing time to midnight before you finish checking the broader late-night evidence.</p>
         <div class="choice-box">
             <label>
-                <input type="radio" name="decision_value" value="Extend Operating Hours" checked>
-                Extend operating hours from 10 PM to midnight
+                <input type="radio" name="decision_value" value="Extend Business Hours to Midnight" checked>
+                Extend business hours to midnight
+            </label>
+        </div>
+        <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
+    `;
+
+    document.getElementById('confirm-submit-btn').addEventListener('click', submitDecision);
+}
+
+function renderLevelSevenRushKeepRunningPanel() {
+    canvasArea.innerHTML = `
+        <h3>Delivery Channel Submission</h3>
+        <p>The manager wants to keep the delivery channel running based on the headline volume before you finish reconciling the raw order data.</p>
+        <div class="choice-box">
+            <label>
+                <input type="radio" name="decision_value" value="Delivery Channel is Profitable" checked>
+                Keep the delivery channel running because the volume looks strong
             </label>
         </div>
         <button id="confirm-submit-btn" class="primary-action" type="button">Submit Decision</button>
@@ -1162,6 +1558,12 @@ acceptSuggestionBtn.addEventListener('click', () => {
         renderLevelSixRushHoursPanel();
         return;
     }
+
+    if (levelOrder === 7) {
+        entryOverlay.classList.add('hidden');
+        renderLevelSevenRushKeepRunningPanel();
+        return;
+    }
 });
 
 investigateFirstBtn.addEventListener('click', () => {
@@ -1210,6 +1612,7 @@ investigateFirstBtn.addEventListener('click', () => {
     if (levelOrder === 7) {
         entryOverlay.classList.add('hidden');
         stagedInvestigationUnlocked = true;
+        saveLevelSevenState();
         document.querySelectorAll('.item-btn').forEach((button) => {
             button.disabled = false;
         });
@@ -1235,6 +1638,8 @@ async function initLevel() {
         }
     });
 
+    updateCategoryVisibility();
+
     if (levelOrder === 7) {
         initializeLevelSevenRows();
     }
@@ -1249,6 +1654,15 @@ async function initLevel() {
     if ([2, 3, 4, 5, 6, 7].includes(levelOrder)) {
         decisionBtn.disabled = true;
         syncStagedDecisionState();
+    }
+
+    if (levelOrder === 7 && stagedInvestigationUnlocked) {
+        document.querySelectorAll('.item-btn').forEach((button) => {
+            button.disabled = false;
+        });
+        renderLevelSevenProcessingDesk();
+        updateLevelSevenProcessingState();
+        return;
     }
 
     entryOverlay.classList.add('hidden');

@@ -1,7 +1,7 @@
 from django.db import migrations
 
 
-DECISION_TITLE = 'How many kilograms of strawberries should we order for next week?'
+DECISION_TITLE = 'How many kilograms of strawberries should we order for tomorrow?'
 DECISION_TARGET_TEXT = 'Choose the order quantity that feels most reasonable after looking through the clues.'
 DECISION_CONFIG = {'options': [100, 200, 300], 'unit': 'kg'}
 

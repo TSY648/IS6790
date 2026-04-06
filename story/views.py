@@ -5,10 +5,10 @@ from .content import LEVEL_STORIES
 
 def opening_story_view(request):
     story_lines = [
-        'You are a newly hired trainee manager at a neighborhood supermarket, and today is your first day on the job.',
-        "The store manager says the store's performance has been unstable lately, and important decisions cannot rely on gut feeling alone.",
-        'From today on, you will need to use data and information to make more reliable business decisions.',
-        'Your first task is to decide how many strawberries to order for the coming week.',
+        'Congrats on the new job! As Trainee Manager, you\'re here to bring some logic to the aisles.',
+        "The boss is done with 'hunches' - it’s time to let the data do the talking.",
+        'First up: The produce section.',
+        'Analyze the trends and decide on our strawberry order for the week. Make it count!',
     ]
     return render(
         request,
@@ -17,7 +17,7 @@ def opening_story_view(request):
             'story_title': 'Opening Story',
             'story_lines': story_lines,
             'next_url': '/levels/1/',
-            'button_label': 'Start Internship',
+            'button_label': 'Start',
             'help_title': 'Settings & Help',
             'help_description': 'Read the opening setup, then enter the internship challenge when the story finishes.',
         },

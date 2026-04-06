@@ -10,23 +10,23 @@ class Command(BaseCommand):
         level2, created = Level.objects.get_or_create(
             level_code='level_2',
             defaults={
-                'title': 'Egg Inventory Management Crisis',
-                'description': 'Identify and standardize the non-standard units used in egg sales and inventory data. Based on the standardized records, judge the real stock position and decide whether to reorder eggs, avoiding both stock buildup and overstock losses while also preventing egg stockouts and controlling unnecessary purchasing cost.',
-                'objective_text': 'Standardize the egg sales and inventory units, judge the real inventory position, and make the correct decision about whether to reorder eggs.',
-                'briefing_title': 'Egg Inventory Review Desk',
-                'briefing_text': 'The system shows an egg inventory value of only 100, and the store manager wants to place an urgent order for 50 cartons of eggs.',
-                'briefing_hint': 'Do not accept the suggestion at face value. Standardize the inventory and sales units first, then judge whether stock is actually low.',
+                'title': 'Egg Inventory Check',
+                'description': "Don't get tripped up by the numbers. Identify the messy units in our egg reports, standardize the data, and make the final call. Your goal: keep the shelves full without wasting cash on stock we do not need.",
+                'objective_text': 'Clean up the data, find the real inventory count, and decide: to order, or not to order?',
+                'briefing_title': 'Egg Inventory Check',
+                'briefing_text': 'The dashboard says eggs are down to 100 on hand, and the Store Manager wants a 50-carton emergency order right away.',
+                'briefing_hint': 'Pause before you panic. Clean up the units first, then figure out what that 100 really means.',
                 'order': 2,
                 'is_active': True,
             },
         )
         if not created:
-            level2.title = 'Egg Inventory Management Crisis'
-            level2.description = 'Identify and standardize the non-standard units used in egg sales and inventory data. Based on the standardized records, judge the real stock position and decide whether to reorder eggs, avoiding both stock buildup and overstock losses while also preventing egg stockouts and controlling unnecessary purchasing cost.'
-            level2.objective_text = 'Standardize the egg sales and inventory units, judge the real inventory position, and make the correct decision about whether to reorder eggs.'
-            level2.briefing_title = 'Egg Inventory Review Desk'
-            level2.briefing_text = 'The system shows an egg inventory value of only 100, and the store manager wants to place an urgent order for 50 cartons of eggs.'
-            level2.briefing_hint = 'Do not accept the suggestion at face value. Standardize the inventory and sales units first, then judge whether stock is actually low.'
+            level2.title = 'Egg Inventory Check'
+            level2.description = "Don't get tripped up by the numbers. Identify the messy units in our egg reports, standardize the data, and make the final call. Your goal: keep the shelves full without wasting cash on stock we do not need."
+            level2.objective_text = 'Clean up the data, find the real inventory count, and decide: to order, or not to order?'
+            level2.briefing_title = 'Egg Inventory Check'
+            level2.briefing_text = 'The dashboard says eggs are down to 100 on hand, and the Store Manager wants a 50-carton emergency order right away.'
+            level2.briefing_hint = 'Pause before you panic. Clean up the units first, then figure out what that 100 really means.'
             level2.order = 2
             level2.is_active = True
             level2.save()
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 'title': 'Store Manager',
                 'content_type': 'text',
                 'content_text': (
-                    '"Hurry and order 50 cartons. The system shows inventory is down to 100, so this week we will definitely run short if we do nothing."'
+                    "Hurry and get 50 cartons ordered! The system is showing only 100 left in stock. If we sit on our hands, we are going to be staring at empty shelves by the weekend."
                 ),
                 'is_key_item': True,
                 'sort_order': 1,
@@ -58,10 +58,10 @@ class Command(BaseCommand):
             {
                 'category': resolved_categories['report'],
                 'item_code': 'egg_sales',
-                'title': 'Egg Historical Sales Data (Last 4 Weeks)',
+                'title': 'Egg Historical Sales Data',
                 'content_type': 'table',
                 'content_text': (
-                    'Weekly egg sales remained relatively stable over the last four weeks, averaging around 150 units with no major fluctuation.'
+                    "Check the trends: egg sales have been rock-steady for the last month, averaging about 150 units a week without any weird spikes. Use this as your normal to see if our current stock actually stacks up."
                 ),
                 'content_json': {
                     'headers': ['Week', 'Egg Sales Volume (Units)'],
@@ -78,22 +78,22 @@ class Command(BaseCommand):
             {
                 'category': resolved_categories['report'],
                 'item_code': 'egg_inventory',
-                'title': 'Current Egg Inventory Data',
+                'title': 'Current Egg Inventory Data (Raw - mixed units)',
                 'content_type': 'table',
                 'content_text': (
-                    'The current inventory table shows mixed product units across the store. Eggs are recorded as 152 units on Monday and rise to 365 units on Sunday, while other products use kg. The system uses non-standard labels, so you must identify what the egg unit really means before deciding whether to reorder.'
+                    "Heads up - our inventory units are a total mess. The records show 152 units on Monday jumping to 100 on Sunday, while other sections are using kg. The labels are not standard, so you'll need to crack the code on what 'units' actually means here before you hit that order button."
                 ),
                 'content_json': {
-                    'headers': ['Product Name', 'Margin Type', 'Unit', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    'headers': ['Date', 'System "On Hand"', 'Unit label in system', 'Notes from backroom staff'],
                     'rows': [
-                        ['Eggs', 'Low Margin', 'Units', '152', '148', '155', '150', '160', '350', '365'],
-                        ['Bananas', 'Low Margin', 'kg', '200', '195', '210', '190', '220', '380', '400'],
-                        ['Cabbage', 'Low Margin', 'kg', '150', '140', '145', '155', '150', '290', '310'],
-                        ['Fuji Apples', 'Normal', 'kg', '150', '155', '140', '145', '160', '165', '175'],
-                        ['Roma Tomatoes', 'Normal', 'kg', '150', '145', '150', '160', '155', '160', '160'],
-                        ['Ribeye Steak', 'High Margin', 'Units', '100', '95', '110', '105', '115', '125', '130'],
-                        ['Strawberries', 'High Margin', 'kg', '148', '142', '140', '145', '140', '150', '300'],
-                        ['DAILY TOTAL', '-', '-', '1050', '1020', '1060', '1050', '1100', '1620', '1840'],
+                        ['Mon', '152', 'eggs', 'Floor count recorded as individual eggs (pieces).'],
+                        ['Wed', '30', 'cartons', 'Backroom received a case of 30 cartons (12 eggs per carton).'],
+                        ['Sat', '16', 'dozen', 'Weekend stocktake logged in dozens (1 dozen = 12 eggs).'],
+                        ['Sun (today)', '100', 'units', 'Dashboard label is vague. In this store, "units" usually means cartons (not individual eggs).'],
+                    ],
+                    'footer_lines': [
+                        'Standardization key (for the player to infer/apply): 1 carton = 12 eggs; 1 dozen = 12 eggs.',
+                        'Checkpoint: If "100 units" = 100 cartons, that is 1,200 eggs on hand - far above the ~150 eggs/week baseline - so the correct decision is Do Not Place Order.',
                     ],
                 },
                 'is_key_item': True,
@@ -115,10 +115,10 @@ class Command(BaseCommand):
             level=level2,
             defaults={
                 'title': 'Egg Reorder Decision',
-                'target_text': 'Unify the egg sales and inventory units, judge the real stock position, and choose the correct action.',
+                'target_text': 'Ready to lock it in? Should we pull the trigger on those 50 cartons?',
                 'decision_type': 'single_choice',
                 'config_json': {
-                    'options': ['Order', 'Do not order'],
+                    'options': ['Place Order', 'Do Not Place Order'],
                     'unit': '',
                 },
             },
@@ -127,20 +127,20 @@ class Command(BaseCommand):
         rules = [
             {
                 'rule_name': 'success_do_not_order',
-                'condition_json': {'selected_value': 'Do not order'},
+                'condition_json': {'selected_value': 'Do Not Place Order'},
                 'is_success': True,
                 'message': (
-                    'Congratulations. You recognized that the egg sales and inventory records used different units, standardized them correctly, and made the right decision not to reorder. Standardizing the records helped you avoid unnecessary stock buildup and wasted purchasing cost.'
+                    'Spot on! You saw right through the unit mess and realized we were not actually running low. By standardizing those records, you made the smart call to hold off on the order. You just saved the store from a massive overstock headache and kept our purchasing costs right where they belong. Nice work!'
                 ),
                 'score': 50,
                 'next_action': 'next_level',
             },
             {
                 'rule_name': 'fail_order',
-                'condition_json': {'selected_value': 'Order'},
+                'condition_json': {'selected_value': 'Place Order'},
                 'is_success': False,
                 'message': (
-                    "You failed this round. You made the reorder decision before standardizing the egg sales and inventory units and followed the manager's suggestion too quickly. The system's 100 was not a standardized quantity, and the real stock was 1,000 eggs, far above weekly demand."
+                    "Not quite! You jumped the gun and followed the manager's gut feeling before checking the math. It turns out that 100 in the system was not 100 eggs - it was 100 cartons! With 1,200 eggs actually in the back, we are way overstocked for the week. Next time, always clean up the units before you pull the trigger."
                 ),
                 'score': 0,
                 'next_action': 'restart',

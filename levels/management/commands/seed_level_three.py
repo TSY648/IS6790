@@ -75,17 +75,11 @@ class Command(BaseCommand):
                     'Check the volume: produce sales jumped 40% over our normal baseline. But keep your eyes peeled - most of that growth was in low-margin loss leaders. Remember, moving more boxes does not always mean moving more money.'
                 ),
                 'content_json': {
-                    'headers': ['Line item', 'Baseline weekend', 'Promo weekend (BOGO)', 'Change'],
+                    'headers': ['Metric', 'Before Promotion', 'During Promotion', 'Change'],
                     'rows': [
-                        ['Gross sales (revenue)', '$10,000', '$13,800', '+$3,800'],
-                        ['COGS (paid product cost)', '($6,000)', '($8,970)', '($2,970)'],
-                        ['Gross profit (before promo costs)', '$4,000 (40%)', '$4,830 (35%)', '+$830'],
-                        ['Less: BOGO free item cost (giveaway COGS)', '$0', '($2,550)', '($2,550)'],
-                        ['Less: incremental labour / handling', '$0', '($2,780)', '($2,780)'],
-                        ['Net profit (after promo costs)', '$4,000', '($500)', '($4,500)'],
+                        ['Fresh Produce Gross Sales', '$10,000', '$14,000', '+4,000'],
+                        ['Low-Margin Traffic Items Share', '35%', '68%', '+33%'],
                     ],
-                    'src': '/static/levels/level3/promotion-gross-sales-trend.svg',
-                    'alt': 'Daily sales trend of fresh products last week',
                 },
                 'is_key_item': True,
                 'sort_order': 3,

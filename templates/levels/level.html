@@ -998,12 +998,14 @@ function syncStagedDecisionState() {
     const totalKeyItems = levelConfig.items.filter((item) => item.is_key_item).length;
     const processingReady = levelOrder === 7 ? levelSevenProcessingComplete : true;
     const ready = stagedInvestigationUnlocked && processingReady && viewedKeyItems.size >= totalKeyItems;
-    decisionBtn.disabled = !ready;
     if (ready) {
+        decisionBtn.disabled = false;
         decisionBtn.textContent = levelOrder === 1 ? 'Place Order' : 'Submit Decision';
     } else if (levelOrder === 7 && !levelSevenProcessingComplete) {
+        decisionBtn.disabled = !stagedInvestigationUnlocked;
         decisionBtn.textContent = 'Complete Data Processing First';
     } else {
+        decisionBtn.disabled = true;
         decisionBtn.textContent = 'Review All Core Data First';
     }
 }
@@ -1645,6 +1647,15 @@ async function initLevel() {
     }
 
     decisionBtn.addEventListener('click', () => {
+        if (levelOrder === 7 && stagedInvestigationUnlocked && !levelSevenProcessingComplete) {
+            activeItemCode = null;
+            document.querySelectorAll('.item-btn').forEach((button) => {
+                button.classList.remove('active');
+            });
+            renderLevelSevenProcessingDesk();
+            return;
+        }
+
         if ([2, 3, 4, 5, 6, 7].includes(levelOrder) && decisionBtn.disabled) {
             return;
         }

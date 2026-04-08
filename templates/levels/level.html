@@ -1265,6 +1265,8 @@ function buildFreshLevelSevenRows() {
         return [];
     }
 
+    const duplicateOrderId = rawItem.content_json.duplicate_order_id;
+
     return rawItem.content_json.rows.map((row, index) => ({
         rowKey: index,
         platform: row[0],
@@ -1276,7 +1278,7 @@ function buildFreshLevelSevenRows() {
         unitPrice: row[6],
         itemKey: getLevelSevenItemKey(row[3]),
         isDeleted: false,
-        isDuplicate: index === rawItem.content_json.rows.length - 1,
+        isDuplicate: duplicateOrderId ? row[1] === duplicateOrderId : index === rawItem.content_json.rows.length - 1,
     }));
 }
 

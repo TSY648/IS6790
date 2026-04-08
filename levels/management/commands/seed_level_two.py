@@ -91,10 +91,6 @@ class Command(BaseCommand):
                         ['Sat', '16', 'dozen', 'Weekend stocktake logged in dozens (1 dozen = 12 eggs).'],
                         ['Sun (today)', '100', 'units', 'Dashboard label is vague. In this store, "units" usually means cartons (not individual eggs).'],
                     ],
-                    'footer_lines': [
-                        'Standardization key (for the player to infer/apply): 1 carton = 12 eggs; 1 dozen = 12 eggs.',
-                        'Checkpoint: If "100 units" = 100 cartons, that is 1,200 eggs on hand - far above the ~150 eggs/week baseline - so the correct decision is Do Not Place Order.',
-                    ],
                 },
                 'is_key_item': True,
                 'sort_order': 3,
